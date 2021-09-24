@@ -3,13 +3,13 @@ import 'package:math_expressions/math_expressions.dart';
 import 'package:linalg/linalg.dart';
 import 'dart:math' as math;
 
-import 'package:num_plus_plus/src/backend/mathmodel.dart';
+import 'package:app_calculator/src/backend/math_model.dart';
 
 abstract class Parser {
   final bool isRadMode;
   final String inputString;
-  List _outputStack = [];
-  List _operStack = [];
+  final List _outputStack = [];
+  final List _operStack = [];
   List _stream = [];
 
   Parser(this.inputString, this.isRadMode);
@@ -369,8 +369,8 @@ class MatrixParser extends Parser {
   final String inputString;
   final bool isRadMode;
   final int precision;
-  bool square;
-  bool single;
+  bool square = false;
+  bool single = false;
 
   MatrixParser(this.inputString, {this.isRadMode = true, this.precision = 10}) : super(inputString, isRadMode);
 

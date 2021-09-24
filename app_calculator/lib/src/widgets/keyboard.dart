@@ -2,10 +2,9 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:provider/provider.dart';
-
-import 'package:num_plus_plus/src/widgets/mathbox.dart';
-import 'package:num_plus_plus/src/pages/settingpage.dart';
-import 'package:num_plus_plus/src/backend/mathmodel.dart';
+import 'package:app_calculator/src/widgets/math_box.dart';
+import 'package:app_calculator/src/pages/setting_page.dart';
+import 'package:app_calculator/src/backend/math_model.dart';
 
 class MyButton extends StatelessWidget {
   final Widget child;
@@ -15,9 +14,9 @@ class MyButton extends StatelessWidget {
   final Color fontColor;
 
   const MyButton({
-    @required this.child,
-    @required this.onPressed, 
-    this.onLongPress,
+    required this.child,
+    required this.onPressed,
+    required this.onLongPress,
     this.fontSize = 35,
     this.fontColor = Colors.black,
   });
@@ -41,103 +40,105 @@ class MyButton extends StatelessWidget {
   }
 }
 
-const AspectRatio = 1.2;
+const aspectRatio = 1.2;
 
 class MathKeyBoard extends StatelessWidget {
+  const MathKeyBoard({Key? key}) : super(key: key);
+
   List<Widget> _buildLowButton(MathBoxController mathBoxController) {
     List<Widget> button = [];
 
     for (var i = 7; i <= 9; i++) {
       button.add(MyButton(
         child: Text('$i'),
-        onPressed: () {mathBoxController.addExpression('$i');},
+        onPressed: () {mathBoxController.addExpression('$i');}, onLongPress: () {  },
       ));
     }
 
     button.add(MyButton(
-      child: Icon(// frac
+      child: const Icon(// frac
         IconData(0xe907, fontFamily: 'Keyboard'),
         size: 60.0,
       ),
-      onPressed: () {mathBoxController.addExpression('/', isOperator: true);},
+      onPressed: () {mathBoxController.addExpression('/', isOperator: true);}, onLongPress: () {  },
     ));
 
     button.add(MyButton(
-      child: Icon(MaterialCommunityIcons.getIconData("backspace-outline")),
+      child: const Icon(MaterialCommunityIcons.backspace_outline),
       onPressed: mathBoxController.deleteExpression,
       onLongPress: () async {
         mathBoxController.deleteAllExpression();
-        await mathBoxController.clearAnimationController?.forward();
-        mathBoxController.clearAnimationController?.reset();
+        await mathBoxController.clearAnimationController.forward();
+        mathBoxController.clearAnimationController.reset();
       },
     ));
 
     for (var i = 4; i <= 6; i++) {
       button.add(MyButton(
         child: Text('$i'),
-        onPressed: () {mathBoxController.addExpression('$i');},
+        onPressed: () {mathBoxController.addExpression('$i');}, onLongPress: () {  },
       ));
     }
 
     button.add(MyButton(
-      child: Text('+'),
-      onPressed: () {mathBoxController.addExpression('+', isOperator: true);},
+      child: const Text('+'),
+      onPressed: () {mathBoxController.addExpression('+', isOperator: true);}, onLongPress: () {  },
     ));
 
     button.add(MyButton(
-      child: Text('-'),
-      onPressed: () {mathBoxController.addExpression('-', isOperator: true);},
+      child: const Text('-'),
+      onPressed: () {mathBoxController.addExpression('-', isOperator: true);}, onLongPress: () {  },
     ));
 
     for (var i = 1; i <= 3; i++) {
       button.add(MyButton(
         child: Text('$i'),
-        onPressed: () {mathBoxController.addExpression('$i');},
+        onPressed: () {mathBoxController.addExpression('$i');}, onLongPress: () {  },
       ));
     }
 
     button.add(MyButton(
-      child: Text('×'),
-      onPressed: () {mathBoxController.addExpression('\\\\times', isOperator: true);},
+      child: const Text('×'),
+      onPressed: () {mathBoxController.addExpression('\\\\times', isOperator: true);}, onLongPress: () {  },
     ));
 
     button.add(MyButton(
-      child: Text('÷'),
-      onPressed: () {mathBoxController.addExpression('\\div', isOperator: true);},
+      child: const Text('÷'),
+      onPressed: () {mathBoxController.addExpression('\\div', isOperator: true);}, onLongPress: () {  },
     ));
 
     button.add(MyButton(
-      child: Text('0'),
-      onPressed: () {mathBoxController.addExpression('0');},
+      child: const Text('0'),
+      onPressed: () {mathBoxController.addExpression('0');}, onLongPress: () {  },
     ));
 
     button.add(MyButton(
-      child: Text('.'),
-      onPressed: () {mathBoxController.addExpression('.');},
+      child: const Text('.'),
+      onPressed: () {mathBoxController.addExpression('.');}, onLongPress: () {  },
     ));
 
     button.add(Consumer<CalculationMode>(
       builder: (context, mode, _) => MyButton(
         child: mode.value!=Mode.Matrix?
-          Text('='):
-          Icon(
-            MaterialCommunityIcons.getIconData("matrix"),
+          const Text('='):
+          const Icon(
+            MaterialCommunityIcons.matrix,
             size: 40.0,
           ),
         onPressed: () {
           mode.value==Mode.Basic?mathBoxController.equal():mathBoxController.addExpression('\\\\bmatrix');
-        },
+        }, onLongPress: () {  },
       ),
     ));
 
     button.add(MyButton(
-      child: Text('π'),
-      onPressed: () {mathBoxController.addExpression('\\pi');},
+      child: const Text('π'),
+      onPressed: () {mathBoxController.addExpression('\\pi');}, onLongPress: () {  },
     ));
 
     button.add(MyButton(
-      child: Text('e'),
-      onPressed: () {mathBoxController.addExpression('e');},
+      child: const Text('e'),
+      onPressed: () {mathBoxController.addExpression('e');}, onLongPress: () {  },
     ));
 
     return button;
@@ -147,15 +148,15 @@ class MathKeyBoard extends StatelessWidget {
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
     final mathBoxController = Provider.of<MathBoxController>(context, listen: false);
-    return Container(
-      height: width / 5 * 4 / AspectRatio,
+    return SizedBox(
+      height: width / 5 * 4 / aspectRatio,
       child: Material(
         color: Colors.grey[300],
         elevation: 15.0,
         child: GridView.count(
-          physics: NeverScrollableScrollPhysics(),
+          physics: const NeverScrollableScrollPhysics(),
           crossAxisCount: 5,
-          childAspectRatio: AspectRatio,
+          childAspectRatio: aspectRatio,
           children: _buildLowButton(mathBoxController),
         ),
       ),
@@ -164,28 +165,30 @@ class MathKeyBoard extends StatelessWidget {
 
 }
 
-const AnimationConstant = 8.0;
+const animationConstant = 8.0;
 
 class AtanCurve extends Curve {
   @override
-  double transform(double t) => atan(AnimationConstant*2*t-AnimationConstant)/(2*atan(AnimationConstant))+0.5;
+  double transform(double t) => atan(animationConstant*2*t-animationConstant)/(2*atan(animationConstant))+0.5;
 }
 
 class ExpandKeyBoard extends StatefulWidget {
+  const ExpandKeyBoard({Key? key}) : super(key: key);
+
   @override
   _ExpandKeyBoardState createState() => _ExpandKeyBoardState();
 }
 
 class _ExpandKeyBoardState extends State<ExpandKeyBoard> with TickerProviderStateMixin {
-  AnimationController animationController;
-  Animation keyboardAnimation;
-  Animation arrowAnimation;
-  double _height;
+  late AnimationController animationController;
+  late Animation keyboardAnimation;
+  late Animation arrowAnimation;
+  late double _height;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _height = (MediaQuery.of(context).size.width - 10) / 7 * 3 / AspectRatio;
+    _height = (MediaQuery.of(context).size.width - 10) / 7 * 3 / aspectRatio;
 
     animationController = AnimationController(duration: const Duration(milliseconds: 400),vsync: this);
     final curve = CurvedAnimation(parent: animationController, curve: AtanCurve());
@@ -193,12 +196,12 @@ class _ExpandKeyBoardState extends State<ExpandKeyBoard> with TickerProviderStat
     arrowAnimation = Tween<double>(begin: 15.0, end: 35.0).animate(curve);
   }
 
-  Widget _buildAnimation(BuildContext context, Widget child) {
+  Widget _buildAnimation(BuildContext context, Widget? child) {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 5.0),
+      padding: const EdgeInsets.symmetric(horizontal: 5.0),
       child: Material(
         color: Colors.blueAccent[400],
-        borderRadius: BorderRadius.only(
+        borderRadius: const BorderRadius.only(
           topRight: Radius.circular(20.0),
           topLeft: Radius.circular(20.0),
         ),
@@ -208,9 +211,7 @@ class _ExpandKeyBoardState extends State<ExpandKeyBoard> with TickerProviderStat
             SizedBox(
               height: arrowAnimation.value,
               width: double.infinity,
-              child: FlatButton(
-                splashColor: Colors.transparent,
-                highlightColor: Colors.transparent,
+              child: TextButton(
                 onPressed: () {
                   final setting = Provider.of<SettingModel>(context, listen: false);
                   if (animationController.status == AnimationStatus.dismissed) {
@@ -230,10 +231,10 @@ class _ExpandKeyBoardState extends State<ExpandKeyBoard> with TickerProviderStat
             SizedBox(
               height: keyboardAnimation.value,
               child: GridView.count(
-                physics: NeverScrollableScrollPhysics(),
+                physics: const NeverScrollableScrollPhysics(),
                 crossAxisCount: 7,
                 children: _buildUpButton(),
-                childAspectRatio: AspectRatio,
+                childAspectRatio: aspectRatio,
               ),
             ),
           ],
@@ -255,14 +256,14 @@ class _ExpandKeyBoardState extends State<ExpandKeyBoard> with TickerProviderStat
           onVerticalDragUpdate: (detail) {
             if (keyboardAnimation.value - detail.delta.dy > 0 && keyboardAnimation.value - detail.delta.dy < _height) {
               double y = keyboardAnimation.value - detail.delta.dy;
-              animationController.value = (tan(atan(AnimationConstant)-y*atan(AnimationConstant)*2/_height)+AnimationConstant)/AnimationConstant/2;
+              animationController.value = (tan(atan(animationConstant)-y*atan(animationConstant)*2/_height)+animationConstant)/animationConstant/2;
             }
           },
           onVerticalDragEnd: (detail) {
-            if (detail.primaryVelocity > 0.0) {
+            if (detail.primaryVelocity! > 0.0) {
               animationController.animateTo(1.0, duration: const Duration(milliseconds: 200));
               setting.changeKeyboardMode(true);
-            } else if (detail.primaryVelocity < 0.0) {
+            } else if (detail.primaryVelocity! < 0.0) {
               animationController.animateBack(0.0, duration: const Duration(milliseconds: 200));
               setting.changeKeyboardMode(false);
             } else if (keyboardAnimation.value > _height*0.8) {
@@ -287,64 +288,64 @@ class _ExpandKeyBoardState extends State<ExpandKeyBoard> with TickerProviderStat
     List<Widget> button = [];
     const fontSize = 25.0;
     const iconSize = 45.0;
-    var fontColor = Colors.grey[200];
+    var fontColor = (Colors.grey[200])!;
 
     button.add(MyButton(
-      child: Text('sin'),
+      child: const Text('sin'),
       fontSize: fontSize,
       fontColor: fontColor,
       onPressed: () {
         mathBoxController.addExpression('\\sin');
         mathBoxController.addExpression('(');
-      },
+      }, onLongPress: () {  },
     ));
 
     button.add(MyButton(
-      child: Text('cos'),
+      child: const Text('cos'),
       fontSize: fontSize,
       fontColor: fontColor,
       onPressed: () {
         mathBoxController.addExpression('\\cos');
         mathBoxController.addExpression('(');
-      },
+      }, onLongPress: () {  },
     ));
 
     button.add(MyButton(
-      child: Text('tan'),
+      child: const Text('tan'),
       fontSize: fontSize,
       fontColor: fontColor,
       onPressed: () {
         mathBoxController.addExpression('\\\\tan');
         mathBoxController.addExpression('(');
-      },
+      }, onLongPress: () {  },
     ));
 
     button.add(MyButton(
       child: Icon(// sqrt
-        IconData(0xe90a, fontFamily: 'Keyboard'),
+        const IconData(0xe90a, fontFamily: 'Keyboard'),
         color: fontColor,
         size: iconSize,
       ),
       onPressed: () {
         mathBoxController.addExpression('\\sqrt');
-      },
+      }, onLongPress: () {  },
     ));
 
     button.add(MyButton(
       child: Icon(// exp
-        IconData(0xe905, fontFamily: 'Keyboard'),
+        const IconData(0xe905, fontFamily: 'Keyboard'),
         color: fontColor,
         size: iconSize,
       ),
       onPressed: () {
         mathBoxController.addExpression('e');
         mathBoxController.addExpression('^');
-      },
+      }, onLongPress: () {  },
     ));
 
     button.add(MyButton(
       child: Icon(// pow2
-        IconData(0xe909, fontFamily: 'Keyboard'),
+        const IconData(0xe909, fontFamily: 'Keyboard'),
         color: fontColor,
         size: iconSize,
       ),
@@ -352,107 +353,107 @@ class _ExpandKeyBoardState extends State<ExpandKeyBoard> with TickerProviderStat
         mathBoxController.addExpression(')');
         mathBoxController.addExpression('^');
         mathBoxController.addExpression('2');
-      },
+      }, onLongPress: () {  },
     ));
 
     button.add(MyButton(
-      child: Text('ln'),
+      child: const Text('ln'),
       fontSize: fontSize,
       fontColor: fontColor,
       onPressed: () {
         mathBoxController.addExpression('\\ln');
         mathBoxController.addExpression('(');
-      },
+      }, onLongPress: () {  },
     ));
 
     button.add(MyButton(
       child: Icon(// arcsin
-        IconData(0xe903, fontFamily: 'Keyboard'),
+        const IconData(0xe903, fontFamily: 'Keyboard'),
         color: fontColor,
         size: iconSize,
       ),
       onPressed: () {
         mathBoxController.addExpression('\\arcsin');
         mathBoxController.addExpression('(');
-      },
+      }, onLongPress: () {  },
     ));
 
     button.add(MyButton(
       child: Icon(// arccos
-        IconData(0xe902, fontFamily: 'Keyboard'),
+        const IconData(0xe902, fontFamily: 'Keyboard'),
         color: fontColor,
         size: iconSize,
       ),
       onPressed: () {
         mathBoxController.addExpression('\\arccos');
         mathBoxController.addExpression('(');
-      },
+      }, onLongPress: () {  },
     ));
 
     button.add(MyButton(
       child: Icon(// arctan
-        IconData(0xe904, fontFamily: 'Keyboard'),
+        const IconData(0xe904, fontFamily: 'Keyboard'),
         color: fontColor,
         size: iconSize,
       ),
       onPressed: () {
         mathBoxController.addExpression('\\arctan');
         mathBoxController.addExpression('(');
-      },
+      }, onLongPress: () {  },
     ));
 
     button.add(MyButton(
       child: Icon(// nrt
-        IconData(0xe908, fontFamily: 'Keyboard'),
+        const IconData(0xe908, fontFamily: 'Keyboard'),
         color: fontColor,
         size: iconSize,
       ),
       onPressed: () {
         mathBoxController.addExpression('\\\\nthroot');
-      },
+      }, onLongPress: () {  },
     ));
 
     button.add(MyButton(
       child: Icon(// abs
-        IconData(0xe901, fontFamily: 'Keyboard'),
+        const IconData(0xe901, fontFamily: 'Keyboard'),
         color: fontColor,
         size: iconSize,
       ),
       onPressed: () {
         mathBoxController.addExpression('\\|');
-      },
+      }, onLongPress: () {  },
     ));
 
     button.add(MyButton(
-      child: Text('('),
+      child: const Text('('),
       fontSize: fontSize,
       fontColor: fontColor,
       onPressed: () {
         mathBoxController.addExpression('(');
-      },
+      }, onLongPress: () {  },
     ));
 
     button.add(MyButton(
-      child: Text(')'),
+      child: const Text(')'),
       fontSize: fontSize,
       fontColor: fontColor,
       onPressed: () {
         mathBoxController.addExpression(')');
-      },
+      }, onLongPress: () {  },
     ));
 
     button.add(MyButton(
-      child: Text('!'),
+      child: const Text('!'),
       fontSize: fontSize,
       fontColor: fontColor,
       onPressed: () {
         mathBoxController.addExpression('!');
-      },
+      }, onLongPress: () {  },
     ));
 
     button.add(MyButton(
       child: Icon(// *10^n
-        IconData(0xe900, fontFamily: 'Keyboard'),
+        const IconData(0xe900, fontFamily: 'Keyboard'),
         color: fontColor,
         size: iconSize,
       ),
@@ -460,11 +461,11 @@ class _ExpandKeyBoardState extends State<ExpandKeyBoard> with TickerProviderStat
       fontColor: fontColor,
       onPressed: () {
         mathBoxController.addExpression('E');
-      },
+      }, onLongPress: () {  },
     ));
 
     button.add(MyButton(
-      child: Text('log'),
+      child: const Text('log'),
       fontSize: fontSize,
       fontColor: fontColor,
       onPressed: () {
@@ -473,19 +474,19 @@ class _ExpandKeyBoardState extends State<ExpandKeyBoard> with TickerProviderStat
         mathBoxController.addKey('Right');
         mathBoxController.addExpression('(');
         mathBoxController.addKey('Left Left');
-      },
+      }, onLongPress: () {  },
     ));
 
     button.add(MyButton(
       child: Icon(// expo
-        IconData(0xe906, fontFamily: 'Keyboard'),
+        const IconData(0xe906, fontFamily: 'Keyboard'),
         color: fontColor,
         size: iconSize,
       ),
       onPressed: () {
         mathBoxController.addExpression(')');
         mathBoxController.addExpression('^');
-      },
+      }, onLongPress: () {  },
     ));
 
     // button.add(MyButton(
@@ -510,8 +511,8 @@ class _ExpandKeyBoardState extends State<ExpandKeyBoard> with TickerProviderStat
           mathBoxController.addString(expression);
         } catch (e) {
           final snackBar = SnackBar(
-            content: Text('This is the first result'),
-            duration: Duration(milliseconds: 700,),
+            content: const Text('This is the first result'),
+            duration: const Duration(milliseconds: 700,),
             action: SnackBarAction(
               label: 'OK',
               onPressed: (){},
@@ -534,8 +535,8 @@ class _ExpandKeyBoardState extends State<ExpandKeyBoard> with TickerProviderStat
           mathBoxController.addString(expression);
         } catch (e) {
           final snackBar = SnackBar(
-            content: Text('This is the last result'),
-            duration: Duration(milliseconds: 700,),
+            content: const Text('This is the last result'),
+            duration: const Duration(milliseconds: 700,),
             action: SnackBarAction(
               label: 'OK',
               onPressed: (){},
@@ -547,7 +548,7 @@ class _ExpandKeyBoardState extends State<ExpandKeyBoard> with TickerProviderStat
     ));
 
     button.add(MyButton(
-      child: Text('Ans'),
+      child: const Text('Ans'),
       fontSize: fontSize,
       fontColor: fontColor,
       onPressed: () {
@@ -555,8 +556,8 @@ class _ExpandKeyBoardState extends State<ExpandKeyBoard> with TickerProviderStat
           mathBoxController.addExpression('Ans');
         } else {
           final snackBar = SnackBar(
-            content: Text('Unable to input Ans now'),
-            duration: Duration(milliseconds: 500,),
+            content: const Text('Unable to input Ans now'),
+            duration: const Duration(milliseconds: 500,),
             action: SnackBarAction(
               label: 'OK',
               onPressed: (){},
@@ -564,7 +565,7 @@ class _ExpandKeyBoardState extends State<ExpandKeyBoard> with TickerProviderStat
           );
           Scaffold.of(context).showSnackBar(snackBar);
         }
-      },
+      }, onLongPress: () {  },
     ));
 
     return button;

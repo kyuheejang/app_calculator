@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'package:num_plus_plus/src/backend/mathmodel.dart';
+import 'package:app_calculator/src/backend/math_model.dart';
 
 class Result extends StatefulWidget {
   @override
@@ -10,8 +10,8 @@ class Result extends StatefulWidget {
 
 class _ResultState extends State<Result> with TickerProviderStateMixin {
 
-  AnimationController animationController;
-  Animation animation;
+  late AnimationController animationController;
+  late Animation animation;
 
   @override
   void initState() {
@@ -29,12 +29,12 @@ class _ResultState extends State<Result> with TickerProviderStateMixin {
     super.dispose();
   }
 
-  Widget _buildAnimation(BuildContext context, Widget child) {
+  Widget _buildAnimation(BuildContext context, Widget? child) {
     return Container(
       height: animation.value,
       width: double.infinity,
       alignment: Alignment.centerRight,
-      padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 2.0),
+      padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 2.0),
       child: Consumer<MathModel>(
         builder: (_, model, __) {
           String text;

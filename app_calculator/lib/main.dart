@@ -3,23 +3,26 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 
-import 'package:num_plus_plus/src/widgets/mathbox.dart';
-import 'package:num_plus_plus/src/widgets/result.dart';
-import 'package:num_plus_plus/src/widgets/matrixbutton.dart';
-import 'package:num_plus_plus/src/widgets/keyboard.dart';
-import 'package:num_plus_plus/src/backend/mathmodel.dart';
-import 'package:num_plus_plus/src/pages/settingpage.dart';
-import 'package:num_plus_plus/src/pages/functionpage.dart';
+import 'package:app_calculator/src/widgets/math_box.dart';
+import 'package:app_calculator/src/widgets/result.dart';
+import 'package:app_calculator/src/widgets/matrixbutton.dart';
+import 'package:app_calculator/src/widgets/keyboard.dart';
+import 'package:app_calculator/src/backend/math_model.dart';
+import 'package:app_calculator/src/pages/setting_page.dart';
+import 'package:app_calculator/src/pages/functionpage.dart';
+
 
 void main() {
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     SystemChrome.setSystemUIOverlayStyle(
-      SystemUiOverlayStyle(
+      const SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
       ),
     );
@@ -29,14 +32,14 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => SettingModel()),
         ChangeNotifierProxyProvider<SettingModel, MathModel>(
           create: (context) => MathModel(),
-          update: (context, settings, model) => model
+          update: (context, settings, model) => model!
             ..changeSetting(
                 precision: settings.precision.toInt(),
                 isRadMode: settings.isRadMode),
         ),
         ChangeNotifierProxyProvider<SettingModel, MatrixModel>(
           create: (context) => MatrixModel(),
-          update: (context, settings, model) => model
+          update: (context, settings, model) => model!
             ..changeSetting(
               precision: settings.precision.toInt(),
             ),
@@ -48,16 +51,16 @@ class MyApp extends StatelessWidget {
             if (settings.loading.isCompleted) {
               switch (settings.initPage) {
                 case 0:
-                  if (model.value == Mode.Matrix) {
+                  if (model!.value == Mode.Matrix) {
                     model.value = Mode.Basic;
                   }
                   break;
                 case 1:
-                  model.changeMode(Mode.Matrix);
+                  model!.changeMode(Mode.Matrix);
                   break;
               }
             }
-            return model;
+            return model!;
           },
           dispose: (context, value) => value.dispose(),
         ),
@@ -82,7 +85,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage>
     with SingleTickerProviderStateMixin {
   final Server _server = Server();
-  TabController tabController;
+  late TabController tabController;
   List tabs = ["Basic", "Matrix"];
 
   @override
@@ -102,7 +105,7 @@ class _HomePageState extends State<HomePage>
   Widget build(BuildContext context) {
     final mode = Provider.of<CalculationMode>(context, listen: false);
     final mathBoxController =
-        Provider.of<MathBoxController>(context, listen: false);
+    Provider.of<MathBoxController>(context, listen: false);
     final setting = Provider.of<SettingModel>(context, listen: false);
     return Scaffold(
       appBar: AppBar(
@@ -110,8 +113,8 @@ class _HomePageState extends State<HomePage>
         backgroundColor: Colors.transparent,
         brightness: Brightness.light,
         leading: IconButton(
-          icon: Icon(
-            MaterialCommunityIcons.getIconData("settings-outline"),
+          icon: const Icon(
+            MaterialCommunityIcons.settings_outline,
             color: Colors.grey,
           ),
           onPressed: () {
@@ -138,7 +141,7 @@ class _HomePageState extends State<HomePage>
                 ),
                 borderRadius: BorderRadius.circular(10.0),
               ),
-              tabs: <Widget>[
+              tabs: const <Widget>[
                 Tab(text: 'Basic'),
                 Tab(text: 'Matrix'),
               ],
@@ -185,6 +188,8 @@ class _HomePageState extends State<HomePage>
 }
 
 class SlidComponent extends StatelessWidget {
+  const SlidComponent({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -200,8 +205,8 @@ class SlidComponent extends StatelessWidget {
                 return MatrixButton();
                 break;
               case Mode.Function:
-                return OutlineButton(
-                  child: Text('Analyze'),
+                return OutlinedButton(
+                  child: const Text('Analyze'),
                   onPressed: () {
                     Navigator.push(
                       context,
@@ -218,9 +223,9 @@ class SlidComponent extends StatelessWidget {
         Consumer<CalculationMode>(
           builder: (context, mathMode, _) => mathMode.value != Mode.Matrix
               ? ExpandKeyBoard()
-              : SizedBox(
-                  height: 0.0,
-                ),
+              : const SizedBox(
+            height: 0.0,
+          ),
         ),
       ],
     );

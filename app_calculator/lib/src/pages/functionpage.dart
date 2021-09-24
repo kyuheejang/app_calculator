@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:fl_chart/fl_chart.dart';
 
-import 'package:num_plus_plus/src/backend/mathmodel.dart';
+import 'package:app_calculator/src/backend/math_model.dart';
 
 class FunctionPage extends StatelessWidget {
   @override
@@ -43,9 +43,9 @@ class _FunctionChartState extends State<FunctionChart> {
     double step = (end - start) / interval;
     List<FlSpot> spots = [];
     for (var i = 0; i < interval; i++) {
-      var result = calc(start+step*i);
+      num result = calc(start+step*i);
       if (result.isFinite) {
-        spots.add(FlSpot(start+step*i, result));
+        spots.add(FlSpot(start+step*i, result.toDouble()));
       }
     }
     return spots;
@@ -92,7 +92,7 @@ class _FunctionChartState extends State<FunctionChart> {
         ],
         gridData: FlGridData(
           show: false,
-          getDrawingHorizontalGridLine: (value) {
+          getDrawingHorizontalLine: (value) {
             return FlLine();
           }
         ),
@@ -103,7 +103,7 @@ class _FunctionChartState extends State<FunctionChart> {
               if(value.remainder(5) == 0) {
                 return value.toInt().toString();
               } else {
-                return null;
+                return "";
               }
             }
           ),
@@ -113,14 +113,13 @@ class _FunctionChartState extends State<FunctionChart> {
               if(value.remainder(5) == 0) {
                 return value.toInt().toString();
               } else {
-                return null;
+                return "";
               }
             }
           ),
         ),
         lineTouchData: LineTouchData(
           enabled: false,
-          enableNormalTouch: false,
           handleBuiltInTouches: false,
           // touchCallback: (response) {
           //   if (response.touchInput.getOffset().dx != 0.0) {
