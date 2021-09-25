@@ -6,18 +6,52 @@ import 'package:app_calculator/src/widgets/math_box.dart';
 import 'package:app_calculator/src/pages/setting_page.dart';
 import 'package:app_calculator/src/backend/math_model.dart';
 
-class MyButton extends StatelessWidget {
+class NumButton extends StatelessWidget {
   final Widget child;
   final VoidCallback onPressed;
-  final VoidCallback onLongPress;
+  final VoidCallback? onLongPress;
   final double fontSize;
   final Color fontColor;
 
-  const MyButton({
+  const NumButton({
     required this.child,
     required this.onPressed,
-    required this.onLongPress,
-    this.fontSize = 35,
+    this.onLongPress,
+    this.fontSize = 30,
+    this.fontColor = Colors.black,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return DefaultTextStyle(
+      style: TextStyle(
+        fontSize: fontSize,
+        color: fontColor,
+        fontFamily: "GemunuLibre",
+      ),
+      child: InkResponse(
+        splashFactory: InkRipple.splashFactory,
+        highlightColor: Colors.transparent,
+        onTap: onPressed,
+        onLongPress: onLongPress,
+        child: Center(child: child,),
+      ),
+    );
+  }
+}
+
+class SignButton extends StatelessWidget {
+  final Widget child;
+  final VoidCallback onPressed;
+  final VoidCallback? onLongPress;
+  final double fontSize;
+  final Color fontColor;
+
+  const SignButton({
+    required this.child,
+    required this.onPressed,
+    this.onLongPress,
+    this.fontSize = 25,
     this.fontColor = Colors.black,
   });
 
@@ -40,6 +74,7 @@ class MyButton extends StatelessWidget {
   }
 }
 
+
 const aspectRatio = 1.2;
 
 class MathKeyBoard extends StatelessWidget {
@@ -49,13 +84,13 @@ class MathKeyBoard extends StatelessWidget {
     List<Widget> button = [];
 
     for (var i = 7; i <= 9; i++) {
-      button.add(MyButton(
+      button.add(NumButton(
         child: Text('$i'),
-        onPressed: () {mathBoxController.addExpression('$i');}, onLongPress: () {  },
+        onPressed: () {mathBoxController.addExpression('$i');},
       ));
     }
 
-    button.add(MyButton(
+    button.add(NumButton(
       child: const Icon(// frac
         IconData(0xe907, fontFamily: 'Keyboard'),
         size: 60.0,
@@ -63,7 +98,7 @@ class MathKeyBoard extends StatelessWidget {
       onPressed: () {mathBoxController.addExpression('/', isOperator: true);}, onLongPress: () {  },
     ));
 
-    button.add(MyButton(
+    button.add(NumButton(
       child: const Icon(MaterialCommunityIcons.backspace_outline),
       onPressed: mathBoxController.deleteExpression,
       onLongPress: () async {
@@ -74,51 +109,51 @@ class MathKeyBoard extends StatelessWidget {
     ));
 
     for (var i = 4; i <= 6; i++) {
-      button.add(MyButton(
+      button.add(NumButton(
         child: Text('$i'),
-        onPressed: () {mathBoxController.addExpression('$i');}, onLongPress: () {  },
+        onPressed: () {mathBoxController.addExpression('$i');},
       ));
     }
 
-    button.add(MyButton(
+    button.add(NumButton(
       child: const Text('+'),
-      onPressed: () {mathBoxController.addExpression('+', isOperator: true);}, onLongPress: () {  },
+      onPressed: () {mathBoxController.addExpression('+', isOperator: true);},
     ));
 
-    button.add(MyButton(
+    button.add(NumButton(
       child: const Text('-'),
-      onPressed: () {mathBoxController.addExpression('-', isOperator: true);}, onLongPress: () {  },
+      onPressed: () {mathBoxController.addExpression('-', isOperator: true);},
     ));
 
     for (var i = 1; i <= 3; i++) {
-      button.add(MyButton(
+      button.add(NumButton(
         child: Text('$i'),
-        onPressed: () {mathBoxController.addExpression('$i');}, onLongPress: () {  },
+        onPressed: () {mathBoxController.addExpression('$i');},
       ));
     }
 
-    button.add(MyButton(
+    button.add(NumButton(
       child: const Text('×'),
-      onPressed: () {mathBoxController.addExpression('\\\\times', isOperator: true);}, onLongPress: () {  },
+      onPressed: () {mathBoxController.addExpression('\\\\times', isOperator: true);},
     ));
 
-    button.add(MyButton(
+    button.add(NumButton(
       child: const Text('÷'),
-      onPressed: () {mathBoxController.addExpression('\\div', isOperator: true);}, onLongPress: () {  },
+      onPressed: () {mathBoxController.addExpression('\\div', isOperator: true);},
     ));
 
-    button.add(MyButton(
+    button.add(NumButton(
       child: const Text('0'),
-      onPressed: () {mathBoxController.addExpression('0');}, onLongPress: () {  },
+      onPressed: () {mathBoxController.addExpression('0');},
     ));
 
-    button.add(MyButton(
+    button.add(NumButton(
       child: const Text('.'),
-      onPressed: () {mathBoxController.addExpression('.');}, onLongPress: () {  },
+      onPressed: () {mathBoxController.addExpression('.');},
     ));
 
     button.add(Consumer<CalculationMode>(
-      builder: (context, mode, _) => MyButton(
+      builder: (context, mode, _) => NumButton(
         child: mode.value!=Mode.Matrix?
           const Text('='):
           const Icon(
@@ -131,14 +166,14 @@ class MathKeyBoard extends StatelessWidget {
       ),
     ));
 
-    button.add(MyButton(
+    button.add(NumButton(
       child: const Text('π'),
-      onPressed: () {mathBoxController.addExpression('\\pi');}, onLongPress: () {  },
+      onPressed: () {mathBoxController.addExpression('\\pi');},
     ));
 
-    button.add(MyButton(
+    button.add(NumButton(
       child: const Text('e'),
-      onPressed: () {mathBoxController.addExpression('e');}, onLongPress: () {  },
+      onPressed: () {mathBoxController.addExpression('e');},
     ));
 
     return button;
@@ -202,8 +237,8 @@ class _ExpandKeyBoardState extends State<ExpandKeyBoard> with TickerProviderStat
       child: Material(
         color: Colors.blueAccent[400],
         borderRadius: const BorderRadius.only(
-          topRight: Radius.circular(20.0),
-          topLeft: Radius.circular(20.0),
+          topRight: Radius.circular(10.0),
+          topLeft: Radius.circular(10.0),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -290,37 +325,37 @@ class _ExpandKeyBoardState extends State<ExpandKeyBoard> with TickerProviderStat
     const iconSize = 45.0;
     var fontColor = (Colors.grey[200])!;
 
-    button.add(MyButton(
+    button.add(SignButton(
       child: const Text('sin'),
       fontSize: fontSize,
       fontColor: fontColor,
       onPressed: () {
         mathBoxController.addExpression('\\sin');
         mathBoxController.addExpression('(');
-      }, onLongPress: () {  },
+      },
     ));
 
-    button.add(MyButton(
+    button.add(SignButton(
       child: const Text('cos'),
       fontSize: fontSize,
       fontColor: fontColor,
       onPressed: () {
         mathBoxController.addExpression('\\cos');
         mathBoxController.addExpression('(');
-      }, onLongPress: () {  },
+      },
     ));
 
-    button.add(MyButton(
+    button.add(SignButton(
       child: const Text('tan'),
       fontSize: fontSize,
       fontColor: fontColor,
       onPressed: () {
         mathBoxController.addExpression('\\\\tan');
         mathBoxController.addExpression('(');
-      }, onLongPress: () {  },
+      },
     ));
 
-    button.add(MyButton(
+    button.add(SignButton(
       child: Icon(// sqrt
         const IconData(0xe90a, fontFamily: 'Keyboard'),
         color: fontColor,
@@ -328,10 +363,10 @@ class _ExpandKeyBoardState extends State<ExpandKeyBoard> with TickerProviderStat
       ),
       onPressed: () {
         mathBoxController.addExpression('\\sqrt');
-      }, onLongPress: () {  },
+      },
     ));
 
-    button.add(MyButton(
+    button.add(SignButton(
       child: Icon(// exp
         const IconData(0xe905, fontFamily: 'Keyboard'),
         color: fontColor,
@@ -340,10 +375,10 @@ class _ExpandKeyBoardState extends State<ExpandKeyBoard> with TickerProviderStat
       onPressed: () {
         mathBoxController.addExpression('e');
         mathBoxController.addExpression('^');
-      }, onLongPress: () {  },
+      },
     ));
 
-    button.add(MyButton(
+    button.add(SignButton(
       child: Icon(// pow2
         const IconData(0xe909, fontFamily: 'Keyboard'),
         color: fontColor,
@@ -353,20 +388,20 @@ class _ExpandKeyBoardState extends State<ExpandKeyBoard> with TickerProviderStat
         mathBoxController.addExpression(')');
         mathBoxController.addExpression('^');
         mathBoxController.addExpression('2');
-      }, onLongPress: () {  },
+      },
     ));
 
-    button.add(MyButton(
+    button.add(SignButton(
       child: const Text('ln'),
       fontSize: fontSize,
       fontColor: fontColor,
       onPressed: () {
         mathBoxController.addExpression('\\ln');
         mathBoxController.addExpression('(');
-      }, onLongPress: () {  },
+      },
     ));
 
-    button.add(MyButton(
+    button.add(SignButton(
       child: Icon(// arcsin
         const IconData(0xe903, fontFamily: 'Keyboard'),
         color: fontColor,
@@ -375,10 +410,10 @@ class _ExpandKeyBoardState extends State<ExpandKeyBoard> with TickerProviderStat
       onPressed: () {
         mathBoxController.addExpression('\\arcsin');
         mathBoxController.addExpression('(');
-      }, onLongPress: () {  },
+      },
     ));
 
-    button.add(MyButton(
+    button.add(SignButton(
       child: Icon(// arccos
         const IconData(0xe902, fontFamily: 'Keyboard'),
         color: fontColor,
@@ -387,10 +422,10 @@ class _ExpandKeyBoardState extends State<ExpandKeyBoard> with TickerProviderStat
       onPressed: () {
         mathBoxController.addExpression('\\arccos');
         mathBoxController.addExpression('(');
-      }, onLongPress: () {  },
+      },
     ));
 
-    button.add(MyButton(
+    button.add(SignButton(
       child: Icon(// arctan
         const IconData(0xe904, fontFamily: 'Keyboard'),
         color: fontColor,
@@ -399,10 +434,10 @@ class _ExpandKeyBoardState extends State<ExpandKeyBoard> with TickerProviderStat
       onPressed: () {
         mathBoxController.addExpression('\\arctan');
         mathBoxController.addExpression('(');
-      }, onLongPress: () {  },
+      },
     ));
 
-    button.add(MyButton(
+    button.add(SignButton(
       child: Icon(// nrt
         const IconData(0xe908, fontFamily: 'Keyboard'),
         color: fontColor,
@@ -410,10 +445,10 @@ class _ExpandKeyBoardState extends State<ExpandKeyBoard> with TickerProviderStat
       ),
       onPressed: () {
         mathBoxController.addExpression('\\\\nthroot');
-      }, onLongPress: () {  },
+      },
     ));
 
-    button.add(MyButton(
+    button.add(SignButton(
       child: Icon(// abs
         const IconData(0xe901, fontFamily: 'Keyboard'),
         color: fontColor,
@@ -421,37 +456,37 @@ class _ExpandKeyBoardState extends State<ExpandKeyBoard> with TickerProviderStat
       ),
       onPressed: () {
         mathBoxController.addExpression('\\|');
-      }, onLongPress: () {  },
+      },
     ));
 
-    button.add(MyButton(
+    button.add(SignButton(
       child: const Text('('),
       fontSize: fontSize,
       fontColor: fontColor,
       onPressed: () {
         mathBoxController.addExpression('(');
-      }, onLongPress: () {  },
+      },
     ));
 
-    button.add(MyButton(
+    button.add(SignButton(
       child: const Text(')'),
       fontSize: fontSize,
       fontColor: fontColor,
       onPressed: () {
         mathBoxController.addExpression(')');
-      }, onLongPress: () {  },
+      },
     ));
 
-    button.add(MyButton(
+    button.add(SignButton(
       child: const Text('!'),
       fontSize: fontSize,
       fontColor: fontColor,
       onPressed: () {
         mathBoxController.addExpression('!');
-      }, onLongPress: () {  },
+      },
     ));
 
-    button.add(MyButton(
+    button.add(SignButton(
       child: Icon(// *10^n
         const IconData(0xe900, fontFamily: 'Keyboard'),
         color: fontColor,
@@ -461,10 +496,10 @@ class _ExpandKeyBoardState extends State<ExpandKeyBoard> with TickerProviderStat
       fontColor: fontColor,
       onPressed: () {
         mathBoxController.addExpression('E');
-      }, onLongPress: () {  },
+      },
     ));
 
-    button.add(MyButton(
+    button.add(SignButton(
       child: const Text('log'),
       fontSize: fontSize,
       fontColor: fontColor,
@@ -474,10 +509,10 @@ class _ExpandKeyBoardState extends State<ExpandKeyBoard> with TickerProviderStat
         mathBoxController.addKey('Right');
         mathBoxController.addExpression('(');
         mathBoxController.addKey('Left Left');
-      }, onLongPress: () {  },
+      },
     ));
 
-    button.add(MyButton(
+    button.add(SignButton(
       child: Icon(// expo
         const IconData(0xe906, fontFamily: 'Keyboard'),
         color: fontColor,
@@ -486,7 +521,7 @@ class _ExpandKeyBoardState extends State<ExpandKeyBoard> with TickerProviderStat
       onPressed: () {
         mathBoxController.addExpression(')');
         mathBoxController.addExpression('^');
-      }, onLongPress: () {  },
+      },
     ));
 
     // button.add(MyButton(
@@ -499,7 +534,7 @@ class _ExpandKeyBoardState extends State<ExpandKeyBoard> with TickerProviderStat
     //   },
     // ));
 
-    button.add(MyButton(
+    button.add(SignButton(
       child: Icon(Icons.arrow_back, color: fontColor,),
       onPressed: () {
         mathBoxController.addKey('Left');
@@ -523,7 +558,7 @@ class _ExpandKeyBoardState extends State<ExpandKeyBoard> with TickerProviderStat
       },
     ));
 
-    button.add(MyButton(
+    button.add(SignButton(
       child: Icon(Icons.arrow_forward, color: fontColor,),
       onPressed: () {
         mathBoxController.addKey('Right');
@@ -547,7 +582,7 @@ class _ExpandKeyBoardState extends State<ExpandKeyBoard> with TickerProviderStat
       },
     ));
 
-    button.add(MyButton(
+    button.add(SignButton(
       child: const Text('Ans'),
       fontSize: fontSize,
       fontColor: fontColor,
@@ -565,7 +600,7 @@ class _ExpandKeyBoardState extends State<ExpandKeyBoard> with TickerProviderStat
           );
           Scaffold.of(context).showSnackBar(snackBar);
         }
-      }, onLongPress: () {  },
+      },
     ));
 
     return button;

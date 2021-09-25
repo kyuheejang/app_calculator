@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_icons/flutter_icons.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 import 'package:app_calculator/src/widgets/math_box.dart';
 import 'package:app_calculator/src/widgets/result.dart';
@@ -12,7 +13,14 @@ import 'package:app_calculator/src/pages/setting_page.dart';
 import 'package:app_calculator/src/pages/functionpage.dart';
 
 
+final String iOSTestId = 'ca-app-pub-3940256099942544/2934735716';
+final String androidTestId = 'ca-app-pub-3940256099942544/6300978111';
+
+
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  MobileAds.instance.initialize();
+
   runApp(const MyApp());
 }
 
@@ -78,12 +86,36 @@ class MyApp extends StatelessWidget {
 }
 
 class HomePage extends StatefulWidget {
+
   @override
   _HomePageState createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage>
     with SingleTickerProviderStateMixin {
+
+  InterstitialAd? interstitialAd;
+  bool isLoaded= false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    InterstitialAd.load(adUnitId: "ca-app-pub-3940256099942544/1033173712",
+    request: AdRequest(),
+    adLoadCallback: InterstitialAdLoadCallback(
+        onAdLoaded: (ad) {
+          setState(() {
+            isLoaded=true;
+            interstitialAd=ad;
+          });
+        },
+        onAdFailedToLoad: (error) {
+          // Do nothing on failed to load
+          print("Interstitial Failed to load");
+        },
+    ));
+  }
+
   final Server _server = Server();
   late TabController tabController;
   List tabs = ["Basic", "Matrix"];
@@ -103,6 +135,9 @@ class _HomePageState extends State<HomePage>
 
   @override
   Widget build(BuildContext context) {
+    if (isLoaded) {
+      interstitialAd!.show();
+    }
     final mode = Provider.of<CalculationMode>(context, listen: false);
     final mathBoxController =
     Provider.of<MathBoxController>(context, listen: false);
