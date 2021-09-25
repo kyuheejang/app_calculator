@@ -4,9 +4,15 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:app_calculator/src/backend/math_model.dart';
 
 class SettingPage extends StatelessWidget {
+
+  SettingPage(this.adWidget);
+
+  final AdWidget adWidget;
+
   @override
   Widget build(BuildContext context) {
     final mathModel = Provider.of<MathModel>(context, listen: false);
@@ -26,6 +32,7 @@ class SettingPage extends StatelessWidget {
         physics: const NeverScrollableScrollPhysics(),
         padding: const EdgeInsets.symmetric(horizontal: 10.0),
         children: <Widget>[
+          adWidget,
           const ListTile(
             leading: Text(
               'Calc Setting',

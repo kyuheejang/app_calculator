@@ -13,9 +13,8 @@ import 'package:app_calculator/src/pages/setting_page.dart';
 import 'package:app_calculator/src/pages/functionpage.dart';
 
 
-final String iOSTestId = 'ca-app-pub-3940256099942544/2934735716';
-final String androidTestId = 'ca-app-pub-3940256099942544/6300978111';
-
+final String TestInitialAdId = "ca-app-pub-3940256099942544/1033173712";
+final String TestBannerAdId = "ca-app-pub-3940256099942544/6300978111";
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -74,7 +73,7 @@ class MyApp extends StatelessWidget {
         ),
       ],
       child: MaterialApp(
-        title: 'num++',
+        title: 'handy calculator',
         theme: ThemeData(
           primarySwatch: Colors.blue,
           canvasColor: Colors.white,
@@ -94,26 +93,22 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage>
     with SingleTickerProviderStateMixin {
 
+  // 시작 광고
   InterstitialAd? interstitialAd;
   bool isLoaded= false;
+
+  // 배너 광고
+  final BannerAd myBanner = BannerAd(
+    adUnitId: TestBannerAdId,
+    size: AdSize.fullBanner,
+    request: const AdRequest(),
+    listener: const BannerAdListener(),
+  );
+
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    InterstitialAd.load(adUnitId: "ca-app-pub-3940256099942544/1033173712",
-    request: AdRequest(),
-    adLoadCallback: InterstitialAdLoadCallback(
-        onAdLoaded: (ad) {
-          setState(() {
-            isLoaded=true;
-            interstitialAd=ad;
-          });
-        },
-        onAdFailedToLoad: (error) {
-          // Do nothing on failed to load
-          print("Interstitial Failed to load");
-        },
-    ));
   }
 
   final Server _server = Server();
@@ -125,6 +120,24 @@ class _HomePageState extends State<HomePage>
     super.initState();
     tabController = TabController(length: tabs.length, vsync: this);
     _server.start();
+
+    InterstitialAd.load(adUnitId: TestInitialAdId,
+        request: AdRequest(),
+        adLoadCallback: InterstitialAdLoadCallback(
+          onAdLoaded: (ad) {
+            setState(() {
+              isLoaded=true;
+              interstitialAd=ad;
+              interstitialAd!.show();
+            });
+          },
+          onAdFailedToLoad: (error) {
+            // Do nothing on failed to load
+            print("Interstitial Failed to load");
+          },
+        ));
+
+    myBanner.load();
   }
 
   @override
@@ -135,9 +148,9 @@ class _HomePageState extends State<HomePage>
 
   @override
   Widget build(BuildContext context) {
-    if (isLoaded) {
-      interstitialAd!.show();
-    }
+
+
+    final AdWidget adWidget = AdWidget(ad: myBanner);
     final mode = Provider.of<CalculationMode>(context, listen: false);
     final mathBoxController =
     Provider.of<MathBoxController>(context, listen: false);
@@ -155,7 +168,7 @@ class _HomePageState extends State<HomePage>
           onPressed: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => SettingPage()),
+              MaterialPageRoute(builder: (context) => SettingPage(adWidget)),
             );
           },
         ),
@@ -209,7 +222,7 @@ class _HomePageState extends State<HomePage>
           Expanded(
             child: Stack(
               alignment: Alignment.bottomCenter,
-              children: <Widget>[
+              children: const <Widget>[
                 MathBox(),
                 SlidComponent(),
               ],
