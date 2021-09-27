@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:app_calculator/src/backend/math_model.dart';
@@ -25,7 +26,7 @@ class SettingPage extends StatelessWidget {
             Navigator.pop(context);
           },
         ),
-        title: const Text('Setting',),
+        title: const Text('Settings',),
       ),
       body: ListView(
         itemExtent: 60.0,

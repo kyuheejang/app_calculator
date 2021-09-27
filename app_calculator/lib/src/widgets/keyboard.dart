@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:app_calculator/src/widgets/math_box.dart';
 import 'package:app_calculator/src/pages/setting_page.dart';
@@ -18,7 +19,7 @@ class NumButton extends StatelessWidget {
     required this.onPressed,
     this.onLongPress,
     this.fontSize = 30,
-    this.fontColor = Colors.black,
+    this.fontColor = Colors.white,
   });
 
   @override
@@ -90,16 +91,20 @@ class MathKeyBoard extends StatelessWidget {
       ));
     }
 
-    button.add(NumButton(
-      child: const Icon(// frac
-        IconData(0xe907, fontFamily: 'Keyboard'),
-        size: 60.0,
+    button.add(SignButton(
+      child: const Icon(
+        FontAwesomeIcons.broom,
+        color: Colors.white,
       ),
-      onPressed: () {mathBoxController.addExpression('/', isOperator: true);}, onLongPress: () {  },
+      onPressed: mathBoxController.deleteAllExpression,
     ));
 
+
     button.add(NumButton(
-      child: const Icon(MaterialCommunityIcons.backspace_outline),
+      child: const Icon(
+        FontAwesomeIcons.backspace,
+        color: Colors.white,
+      ),
       onPressed: mathBoxController.deleteExpression,
       onLongPress: () async {
         mathBoxController.deleteAllExpression();
@@ -186,7 +191,7 @@ class MathKeyBoard extends StatelessWidget {
     return SizedBox(
       height: width / 5 * 4 / aspectRatio,
       child: Material(
-        color: Colors.grey[300],
+        color: Colors.black87,
         elevation: 15.0,
         child: GridView.count(
           physics: const NeverScrollableScrollPhysics(),
@@ -233,13 +238,9 @@ class _ExpandKeyBoardState extends State<ExpandKeyBoard> with TickerProviderStat
 
   Widget _buildAnimation(BuildContext context, Widget? child) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 5.0),
+      padding: const EdgeInsets.symmetric(horizontal: 0.0),
       child: Material(
-        color: Colors.blueAccent[400],
-        borderRadius: const BorderRadius.only(
-          topRight: Radius.circular(10.0),
-          topLeft: Radius.circular(10.0),
-        ),
+        color: Colors.brown,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
@@ -478,15 +479,6 @@ class _ExpandKeyBoardState extends State<ExpandKeyBoard> with TickerProviderStat
     ));
 
     button.add(SignButton(
-      child: const Text('!'),
-      fontSize: fontSize,
-      fontColor: fontColor,
-      onPressed: () {
-        mathBoxController.addExpression('!');
-      },
-    ));
-
-    button.add(SignButton(
       child: Icon(// *10^n
         const IconData(0xe900, fontFamily: 'Keyboard'),
         color: fontColor,
@@ -524,15 +516,14 @@ class _ExpandKeyBoardState extends State<ExpandKeyBoard> with TickerProviderStat
       },
     ));
 
-    // button.add(MyButton(
-    //   child: Icon(
-    //     MaterialCommunityIcons.getIconData("function-variant"), 
-    //     color: fontColor,
-    //   ),
-    //   onPressed: () {
-    //     mathBoxController.addExpression('x');
-    //   },
-    // ));
+    button.add(NumButton(
+      child: const Icon(// frac
+        IconData(0xe907, fontFamily: 'Keyboard'),
+        size: 40.0,
+        color: Colors.white,
+      ),
+      onPressed: () {mathBoxController.addExpression('/', isOperator: true);}, onLongPress: () {  },
+    ));
 
     button.add(SignButton(
       child: Icon(Icons.arrow_back, color: fontColor,),
@@ -602,6 +593,8 @@ class _ExpandKeyBoardState extends State<ExpandKeyBoard> with TickerProviderStat
         }
       },
     ));
+
+
 
     return button;
   }

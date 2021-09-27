@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_icons/flutter_icons.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:flutter/foundation.dart';
 
 import 'package:app_calculator/src/widgets/math_box.dart';
 import 'package:app_calculator/src/widgets/result.dart';
-import 'package:app_calculator/src/widgets/matrixbutton.dart';
 import 'package:app_calculator/src/widgets/keyboard.dart';
 import 'package:app_calculator/src/backend/math_model.dart';
 import 'package:app_calculator/src/pages/setting_page.dart';
-import 'package:app_calculator/src/pages/functionpage.dart';
 
 
-final String TestInitialAdId = "ca-app-pub-3940256099942544/1033173712";
-final String TestBannerAdId = "ca-app-pub-3940256099942544/6300978111";
+String initialAdId = "ca-app-pub-7262898074206951/3568018492";
+String bannerAdId = "ca-app-pub-7262898074206951/3300425183";
+
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -55,36 +55,26 @@ class MyApp extends StatelessWidget {
         ListenableProxyProvider<SettingModel, CalculationMode>(
           create: (context) => CalculationMode(Mode.Basic),
           update: (context, settings, model) {
-            if (settings.loading.isCompleted) {
-              switch (settings.initPage) {
-                case 0:
-                  if (model!.value == Mode.Matrix) {
-                    model.value = Mode.Basic;
-                  }
-                  break;
-                case 1:
-                  model!.changeMode(Mode.Matrix);
-                  break;
-              }
-            }
             return model!;
           },
           dispose: (context, value) => value.dispose(),
         ),
       ],
       child: MaterialApp(
+        debugShowCheckedModeBanner: false,
         title: 'handy calculator',
         theme: ThemeData(
-          primarySwatch: Colors.blue,
+          primarySwatch: Colors.brown,
           canvasColor: Colors.white,
         ),
-        home: HomePage(),
+        home: const HomePage(),
       ),
     );
   }
 }
 
 class HomePage extends StatefulWidget {
+  const HomePage({Key? key}) : super(key: key);
 
   @override
   _HomePageState createState() => _HomePageState();
@@ -99,7 +89,7 @@ class _HomePageState extends State<HomePage>
 
   // 배너 광고
   final BannerAd myBanner = BannerAd(
-    adUnitId: TestBannerAdId,
+    adUnitId: bannerAdId,
     size: AdSize.fullBanner,
     request: const AdRequest(),
     listener: const BannerAdListener(),
@@ -112,17 +102,20 @@ class _HomePageState extends State<HomePage>
   }
 
   final Server _server = Server();
-  late TabController tabController;
-  List tabs = ["Basic", "Matrix"];
+
 
   @override
   void initState() {
     super.initState();
-    tabController = TabController(length: tabs.length, vsync: this);
     _server.start();
 
-    InterstitialAd.load(adUnitId: TestInitialAdId,
-        request: AdRequest(),
+    if (!kReleaseMode){ // is Release Mode ??
+      initialAdId = "ca-app-pub-3940256099942544/1033173712";
+      bannerAdId = "ca-app-pub-3940256099942544/6300978111";
+    }
+
+    InterstitialAd.load(adUnitId: initialAdId,
+        request: const AdRequest(),
         adLoadCallback: InterstitialAdLoadCallback(
           onAdLoaded: (ad) {
             setState(() {
@@ -132,8 +125,6 @@ class _HomePageState extends State<HomePage>
             });
           },
           onAdFailedToLoad: (error) {
-            // Do nothing on failed to load
-            print("Interstitial Failed to load");
           },
         ));
 
@@ -151,19 +142,15 @@ class _HomePageState extends State<HomePage>
 
 
     final AdWidget adWidget = AdWidget(ad: myBanner);
-    final mode = Provider.of<CalculationMode>(context, listen: false);
-    final mathBoxController =
-    Provider.of<MathBoxController>(context, listen: false);
-    final setting = Provider.of<SettingModel>(context, listen: false);
+
     return Scaffold(
       appBar: AppBar(
         elevation: 0.0,
         backgroundColor: Colors.transparent,
-        brightness: Brightness.light,
         leading: IconButton(
-          icon: const Icon(
-            MaterialCommunityIcons.settings_outline,
-            color: Colors.grey,
+          icon: const FaIcon(
+            FontAwesomeIcons.cogs,
+            color: Colors.black,
           ),
           onPressed: () {
             Navigator.push(
@@ -172,50 +159,32 @@ class _HomePageState extends State<HomePage>
             );
           },
         ),
-        title: FutureBuilder(
-          future: setting.loading.future,
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.done) {
-              tabController.index = setting.initPage;
-            }
-            return TabBar(
-              indicatorColor: Colors.blueAccent[400],
-              controller: tabController,
-              labelColor: Colors.black,
-              indicator: BoxDecoration(
-                border: Border.all(
-                  color: Colors.blueAccent,
-                  width: 2.0,
-                ),
-                borderRadius: BorderRadius.circular(10.0),
-              ),
-              tabs: const <Widget>[
-                Tab(text: 'Basic'),
-                Tab(text: 'Matrix'),
-              ],
-              onTap: (index) {
-                setting.changeInitpage(index);
-                switch (index) {
-                  case 0:
-                    if (mode.value == Mode.Matrix) {
-                      mode.value = Mode.Basic;
-                      mathBoxController.deleteAllExpression();
-                    }
-                    break;
-                  case 1:
-                    if (mode.value != Mode.Matrix) {
-                      mode.value = Mode.Matrix;
-                      mathBoxController.deleteAllExpression();
-                      mathBoxController.addExpression('\\\\bmatrix');
-                    }
-                    break;
-                  default:
-                    throw 'Unknown type';
-                }
-              },
-            );
-          },
-        ),
+        actions: [
+          // IconButton(
+          //   icon: const Icon(
+          //     FontAwesomeIcons.save,
+          //     color: Colors.black,
+          //   ),
+          //   onPressed: () {
+          //     Navigator.push(
+          //       context,
+          //       MaterialPageRoute(builder: (context) => SettingPage(adWidget)),
+          //     );
+          //   },
+          // ),
+          // IconButton(
+          //   icon: const Icon(
+          //     FontAwesomeIcons.hdd,
+          //     color: Colors.black,
+          //   ),
+          //   onPressed: () {
+          //     Navigator.push(
+          //       context,
+          //       MaterialPageRoute(builder: (context) => SettingPage(adWidget)),
+          //     );
+          //   },
+          // ),
+        ],
       ),
       body: Column(
         children: <Widget>[
@@ -228,7 +197,7 @@ class _HomePageState extends State<HomePage>
               ],
             ),
           ),
-          MathKeyBoard(),
+          const MathKeyBoard(),
         ],
       ),
     );
@@ -248,21 +217,6 @@ class SlidComponent extends StatelessWidget {
             switch (mathMode.value) {
               case Mode.Basic:
                 return Result();
-                break;
-              case Mode.Matrix:
-                return MatrixButton();
-                break;
-              case Mode.Function:
-                return OutlinedButton(
-                  child: const Text('Analyze'),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => FunctionPage()),
-                    );
-                  },
-                );
-                break;
               default:
                 throw 'Error';
             }
@@ -270,7 +224,7 @@ class SlidComponent extends StatelessWidget {
         ),
         Consumer<CalculationMode>(
           builder: (context, mathMode, _) => mathMode.value != Mode.Matrix
-              ? ExpandKeyBoard()
+              ? const ExpandKeyBoard()
               : const SizedBox(
             height: 0.0,
           ),
