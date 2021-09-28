@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "522559365275",
+    "project_id": "handy-calculator-android",
+    "storage_bucket": "handy-calculator-android.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:522559365275:android:a19895163277fb252ce63e",
+        "android_client_info": {
+          "package_name": "com.simonj.app_calclulator"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "522559365275-qi1qcr46nemm5hbk54tig8781a3i66ti.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCyl20xxUFQEbIWepEgDWLJ87mss2WNBYM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "522559365275-qi1qcr46nemm5hbk54tig8781a3i66ti.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
