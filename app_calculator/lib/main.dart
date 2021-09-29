@@ -4,6 +4,8 @@ import 'package:provider/provider.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:flutter/foundation.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'package:app_calculator/src/widgets/math_box.dart';
 import 'package:app_calculator/src/widgets/result.dart';
@@ -11,13 +13,28 @@ import 'package:app_calculator/src/widgets/keyboard.dart';
 import 'package:app_calculator/src/backend/math_model.dart';
 import 'package:app_calculator/src/pages/setting_page.dart';
 
+String testInitialAdId = "ca-app-pub-3940256099942544/1033173712";
+String testBannerAdId = "ca-app-pub-3940256099942544/6300978111";
 
-String initialAdId = "ca-app-pub-7262898074206951/3568018492";
-String bannerAdId = "ca-app-pub-7262898074206951/3300425183";
+String initialAdId = "";
+String bannerAdId = "";
 
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+
+  if (!kReleaseMode) { // is Release Mode ??
+    final adCollectionReference = FirebaseFirestore.instance
+        .collection("ad_id").doc("ySiKuE840qZ9zWtmEDNv");
+    var value = await adCollectionReference.get();
+    initialAdId = value.data()?['initialAdId'];
+    bannerAdId = value.data()?['bannerAdId'];
+  } else {
+    initialAdId = testInitialAdId;
+    bannerAdId = testBannerAdId;
+  }
+
   MobileAds.instance.initialize();
 
   runApp(const MyApp());
@@ -83,18 +100,18 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage>
     with SingleTickerProviderStateMixin {
 
+
+
   // 시작 광고
   InterstitialAd? interstitialAd;
   bool isLoaded= false;
 
-  // 배너 광고
   final BannerAd myBanner = BannerAd(
     adUnitId: bannerAdId,
     size: AdSize.fullBanner,
     request: const AdRequest(),
     listener: const BannerAdListener(),
   );
-
 
   @override
   void didChangeDependencies() {
@@ -103,16 +120,16 @@ class _HomePageState extends State<HomePage>
 
   final Server _server = Server();
 
+  void doSomeAsyncStuff() async {
+
+  }
 
   @override
   void initState() {
     super.initState();
     _server.start();
+    doSomeAsyncStuff();
 
-    if (!kReleaseMode){ // is Release Mode ??
-      initialAdId = "ca-app-pub-3940256099942544/1033173712";
-      bannerAdId = "ca-app-pub-3940256099942544/6300978111";
-    }
 
     InterstitialAd.load(adUnitId: initialAdId,
         request: const AdRequest(),
