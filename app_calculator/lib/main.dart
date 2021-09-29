@@ -12,6 +12,7 @@ import 'package:app_calculator/src/widgets/result.dart';
 import 'package:app_calculator/src/widgets/keyboard.dart';
 import 'package:app_calculator/src/backend/math_model.dart';
 import 'package:app_calculator/src/pages/setting_page.dart';
+import 'package:app_tracking_transparency/app_tracking_transparency.dart';
 
 String testInitialAdId = "ca-app-pub-3940256099942544/1033173712";
 String testBannerAdId = "ca-app-pub-3940256099942544/6300978111";
@@ -23,6 +24,7 @@ String bannerAdId = "";
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  final status = await AppTrackingTransparency.requestTrackingAuthorization();
 
   if (kReleaseMode) { // is Release Mode ??
     final adCollectionReference = FirebaseFirestore.instance
