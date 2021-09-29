@@ -215,6 +215,7 @@ class _HomePageState extends State<HomePage>
             ),
           ),
           const MathKeyBoard(),
+          const Padding(padding: EdgeInsets.only(bottom:40)),
         ],
       ),
     );

@@ -49,7 +49,10 @@ flutter:
   uses-material-design: true
 
   assets:
-    - assets/html/
+    - assets/html/homepage.html
+    - assets/html/jquery-3.4.1.min.js
+    - assets/html/mathquill.css
+    - assets/html/mathquill.min.js
 
   fonts:
     - family: TimesNewRoman
