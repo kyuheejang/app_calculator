@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'dart:math';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -10,12 +11,29 @@ import 'package:app_calculator/src/backend/math_model.dart';
 
 class SettingPage extends StatelessWidget {
 
-  SettingPage(this.adWidget);
+  SettingPage(this.bannerWidget, this.initialAdId);
 
-  final AdWidget adWidget;
+  final AdWidget bannerWidget;
+  final String initialAdId;
+  InterstitialAd? interstitialAd;
 
   @override
   Widget build(BuildContext context) {
+    var rng = Random();
+    int randomNumber = rng.nextInt(90) + 10;
+    if (randomNumber % 3 == 0) {
+      InterstitialAd.load(adUnitId: initialAdId,
+          request: const AdRequest(),
+          adLoadCallback: InterstitialAdLoadCallback(
+            onAdLoaded: (ad) {
+              interstitialAd=ad;
+              interstitialAd!.show();
+            },
+            onAdFailedToLoad: (error) {
+            },
+          ));
+    }
+
     final mathModel = Provider.of<MathModel>(context, listen: false);
     return Scaffold(
       appBar: AppBar(
@@ -33,7 +51,7 @@ class SettingPage extends StatelessWidget {
         physics: const NeverScrollableScrollPhysics(),
         padding: const EdgeInsets.symmetric(horizontal: 10.0),
         children: <Widget>[
-          adWidget,
+          bannerWidget,
           const ListTile(
             leading: Text(
               'Calc Setting',
@@ -60,9 +78,14 @@ class SettingPage extends StatelessWidget {
               ),
             ),
           ),
+          SizedBox(height: 100),
           Consumer<SettingModel>(
             builder: (context, setmodel, _) => ListTile(
-              title: const Text('Calc Precision'),
+              title: const Text(
+                'Calc Precision',
+                style: TextStyle(
+                  fontWeight: FontWeight.w700,
+                ),),
               subtitle: Slider(
                 value: setmodel.precision.toDouble(),
                 min: 0.0,
@@ -74,6 +97,77 @@ class SettingPage extends StatelessWidget {
                 },
               ),
               trailing: Text('${setmodel.precision.toInt()}'),
+            ),
+          ),
+          const SizedBox(height: 100),
+          const ListTile(
+            leading: Text(
+              'Change color: function keyboard',
+              style: TextStyle(
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+          Consumer<SettingModel>(
+            builder: (context, setmodel, _) => ListTile(
+              title: ToggleButtons(
+                children: const <Widget>[
+                  Text('Brown'),
+                  Text('Black'),
+                  Text('Red'),
+                  Text('Blue'),
+                  Text('Orange'),
+                ],
+                constraints: const BoxConstraints(
+                  minWidth: 55,
+                  minHeight: 40,
+                ),
+                isSelected: [
+                  setmodel.functionColorList[0],
+                  setmodel.functionColorList[1],
+                  setmodel.functionColorList[2],
+                  setmodel.functionColorList[3],
+                  setmodel.functionColorList[4],
+                ],
+                onPressed: (index) {
+                  setmodel.changeFunctionColor(index);
+                },
+              ),
+            ),
+          ),const SizedBox(height: 100),
+          const ListTile(
+            leading: Text(
+              'Change color: number keyboard',
+              style: TextStyle(
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+          Consumer<SettingModel>(
+            builder: (context, setmodel, _) => ListTile(
+              title: ToggleButtons(
+                children: const <Widget>[
+                  Text('Brown'),
+                  Text('Black'),
+                  Text('Red'),
+                  Text('Blue'),
+                  Text('Orange'),
+                ],
+                constraints: const BoxConstraints(
+                  minWidth: 55,
+                  minHeight: 40,
+                ),
+                isSelected: [
+                  setmodel.numberColorList[0],
+                  setmodel.numberColorList[1],
+                  setmodel.numberColorList[2],
+                  setmodel.numberColorList[3],
+                  setmodel.numberColorList[4],
+                ],
+                onPressed: (index) {
+                  setmodel.changeNumberColor(index);
+                },
+              ),
             ),
           ),
         ],
@@ -88,7 +182,6 @@ class SettingPage extends StatelessWidget {
       throw 'Could not launch $url';
     }
   }
-
 }
 
 class SettingModel with ChangeNotifier {
@@ -97,6 +190,19 @@ class SettingModel with ChangeNotifier {
   bool hideKeyboard = false;
   int initPage = 0;
   Completer loading = Completer();
+
+  bool isFunctionBrown = false;
+  bool isFunctionBlack = false;
+  bool isFunctionRed = false;
+  bool isFunctionBlue = false;
+  bool isFunctionOrange = false;
+
+
+  var functionColorList = [false, false, false, false, false];
+  int functionColorIndex = 0;
+
+  var numberColorList = [false, false, false, false, false];
+  int numberColorIndex = 0;
 
   SettingModel() {
     initVal();
@@ -134,7 +240,34 @@ class SettingModel with ChangeNotifier {
     isRadMode = prefs.getBool('isRadMode') ?? true;
     hideKeyboard = prefs.getBool('hideKeyboard') ?? false;
     initPage = prefs.getInt('initPage') ?? 0;
+    functionColorIndex = prefs.getInt('functionColorIndex') ?? 0;
+    functionColorList[functionColorIndex] = true;
+    numberColorIndex = prefs.getInt('numberColorIndex') ?? 1;
+    numberColorList[numberColorIndex] = true;
     loading.complete();
+
+    notifyListeners();
+  }
+
+  Future changeFunctionColor(int colorIndex) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    for (int i=0; i<functionColorList.length; i++) {
+      functionColorList[i] = false;
+    }
+    functionColorList[colorIndex] = true;
+    prefs.setInt('functionColorIndex', colorIndex);
+    notifyListeners();
+  }
+
+  Future changeNumberColor(int colorIndex) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    for (int i=0; i<numberColorList.length; i++) {
+      numberColorList[i] = false;
+    }
+    numberColorList[colorIndex] = true;
+    prefs.setInt('numberColorIndex', colorIndex);
     notifyListeners();
   }
 

@@ -19,6 +19,11 @@ String testBannerAdId = "ca-app-pub-3940256099942544/6300978111";
 
 String initialAdId = "";
 String bannerAdId = "";
+int functionColorIndex = 0;
+int numberColorIndex = 0;
+Color functionBackgroundColor = Colors.black87;
+Color numberBackgroundColor = Colors.black87;
+
 
 
 void main() async {
@@ -102,8 +107,6 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage>
     with SingleTickerProviderStateMixin {
 
-
-
   // 시작 광고
   InterstitialAd? interstitialAd;
   bool isLoaded= false;
@@ -118,20 +121,6 @@ class _HomePageState extends State<HomePage>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-  }
-
-  final Server _server = Server();
-
-  void doSomeAsyncStuff() async {
-
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _server.start();
-    doSomeAsyncStuff();
-
 
     InterstitialAd.load(adUnitId: initialAdId,
         request: const AdRequest(),
@@ -146,6 +135,19 @@ class _HomePageState extends State<HomePage>
           onAdFailedToLoad: (error) {
           },
         ));
+  }
+
+  final Server _server = Server();
+
+  void doSomeAsyncStuff() async {
+
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _server.start();
+    doSomeAsyncStuff();
 
     myBanner.load();
   }
@@ -159,8 +161,7 @@ class _HomePageState extends State<HomePage>
   @override
   Widget build(BuildContext context) {
 
-
-    final AdWidget adWidget = AdWidget(ad: myBanner);
+    final AdWidget bannerWidget = AdWidget(ad: myBanner);
 
     return Scaffold(
       appBar: AppBar(
@@ -174,8 +175,12 @@ class _HomePageState extends State<HomePage>
           onPressed: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => SettingPage(adWidget)),
-            );
+              MaterialPageRoute(builder: (context) => SettingPage(bannerWidget, initialAdId)),
+            ).then((onValue) {
+              setState(() {
+
+              });
+            });
           },
         ),
         actions: [
@@ -216,7 +221,7 @@ class _HomePageState extends State<HomePage>
               ],
             ),
           ),
-          const MathKeyBoard(),
+          MathKeyBoard(),
           const Padding(padding: EdgeInsets.only(bottom:40)),
         ],
       ),
@@ -244,7 +249,7 @@ class SlidComponent extends StatelessWidget {
         ),
         Consumer<CalculationMode>(
           builder: (context, mathMode, _) => mathMode.value != Mode.Matrix
-              ? const ExpandKeyBoard()
+              ? ExpandKeyBoard()
               : const SizedBox(
             height: 0.0,
           ),

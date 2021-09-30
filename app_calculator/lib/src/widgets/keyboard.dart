@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:app_calculator/src/widgets/math_box.dart';
 import 'package:app_calculator/src/pages/setting_page.dart';
 import 'package:app_calculator/src/backend/math_model.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class NumButton extends StatelessWidget {
   final Widget child;
@@ -79,7 +80,9 @@ class SignButton extends StatelessWidget {
 const aspectRatio = 1.2;
 
 class MathKeyBoard extends StatelessWidget {
-  const MathKeyBoard({Key? key}) : super(key: key);
+
+  Color functionBackgroundColor = Colors.black;
+  Color numberBackgroundColor = Colors.black;
 
   List<Widget> _buildLowButton(MathBoxController mathBoxController) {
     List<Widget> button = [];
@@ -184,28 +187,68 @@ class MathKeyBoard extends StatelessWidget {
     return button;
   }
 
+  Future changeThemeColor() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    int functionColorIndex = prefs.getInt('functionColorIndex') ?? 0;
+    int numberColorIndex = prefs.getInt('numberColorIndex') ?? 1;
+
+    if (functionColorIndex == 0) {
+      functionBackgroundColor = Colors.brown;
+    } else if (functionColorIndex == 1) {
+      functionBackgroundColor = Colors.black;
+    } else if (functionColorIndex == 2) {
+      functionBackgroundColor = Colors.red;
+    } else if (functionColorIndex == 3) {
+      functionBackgroundColor = Colors.blue;
+    } else if (functionColorIndex == 4) {
+      functionBackgroundColor = Colors.orange;
+    } else if (functionColorIndex == 5) {
+      functionBackgroundColor = Colors.white;
+    }
+
+    if (numberColorIndex == 0) {
+      numberBackgroundColor = Colors.brown;
+    } else if (numberColorIndex == 1) {
+      numberBackgroundColor = Colors.black;
+    } else if (numberColorIndex == 2) {
+      numberBackgroundColor = Colors.red;
+    } else if (numberColorIndex == 3) {
+      numberBackgroundColor = Colors.blue;
+    } else if (numberColorIndex == 4) {
+      numberBackgroundColor = Colors.orange;
+    } else if (numberColorIndex == 5) {
+      numberBackgroundColor = Colors.white;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
     final mathBoxController = Provider.of<MathBoxController>(context, listen: false);
-    return SizedBox(
-      height: width / 5 * 4 / aspectRatio,
-      child: Material(
-        color: Colors.black87,
-        elevation: 15.0,
-        child: GridView.count(
-          physics: const NeverScrollableScrollPhysics(),
-          crossAxisCount: 5,
-          childAspectRatio: aspectRatio,
-          children: _buildLowButton(mathBoxController),
-        ),
-      ),
+    return FutureBuilder(
+        future: changeThemeColor(),
+        builder: (context, snapshot) {
+          return SizedBox(
+            height: width / 5 * 4 / aspectRatio,
+            child: Material(
+              color: numberBackgroundColor,
+              elevation: 15.0,
+              child: GridView.count(
+                physics: const NeverScrollableScrollPhysics(),
+                crossAxisCount: 5,
+                childAspectRatio: aspectRatio,
+                children: _buildLowButton(mathBoxController),
+              ),
+            ),
+          );
+        }
     );
   }
-
 }
 
 const animationConstant = 8.0;
+
+
 
 class AtanCurve extends Curve {
   @override
@@ -213,7 +256,9 @@ class AtanCurve extends Curve {
 }
 
 class ExpandKeyBoard extends StatefulWidget {
-  const ExpandKeyBoard({Key? key}) : super(key: key);
+
+  Color functionBackgroundColor = Colors.black87;
+  Color numberBackgroundColor = Colors.black87;
 
   @override
   _ExpandKeyBoardState createState() => _ExpandKeyBoardState();
@@ -224,6 +269,11 @@ class _ExpandKeyBoardState extends State<ExpandKeyBoard> with TickerProviderStat
   late Animation keyboardAnimation;
   late Animation arrowAnimation;
   late double _height;
+
+  Color functionFontColor = Colors.black87;
+  Color functionBackgroundColor = Colors.black87;
+  Color numberFontColor = Colors.black87;
+  Color numberBackgroundColor = Colors.black87;
 
   @override
   void didChangeDependencies() {
@@ -240,7 +290,7 @@ class _ExpandKeyBoardState extends State<ExpandKeyBoard> with TickerProviderStat
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 0.0),
       child: Material(
-        color: Colors.brown,
+        color: functionBackgroundColor,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
@@ -260,7 +310,7 @@ class _ExpandKeyBoardState extends State<ExpandKeyBoard> with TickerProviderStat
                 },
                 child: Icon(
                   (keyboardAnimation.value > _height*0.8)?Icons.keyboard_arrow_down:Icons.keyboard_arrow_up,
-                  color: Colors.grey[200],
+                  color: Colors.white,
                 ),
               ),
             ),
@@ -279,11 +329,57 @@ class _ExpandKeyBoardState extends State<ExpandKeyBoard> with TickerProviderStat
     );
   }
 
+  Future changeThemeColor() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    int functionColorIndex = prefs.getInt('functionColorIndex') ?? 0;
+    int numberColorIndex = prefs.getInt('numberColorIndex') ?? 1;
+
+    if (functionColorIndex == 0) {
+      functionBackgroundColor = Colors.brown;
+      functionFontColor = Colors.white;
+    } else if (functionColorIndex == 1) {
+      functionBackgroundColor = Colors.black;
+      functionFontColor = Colors.white;
+    } else if (functionColorIndex == 2) {
+      functionBackgroundColor = Colors.red;
+      functionFontColor = Colors.white;
+    } else if (functionColorIndex == 3) {
+      functionBackgroundColor = Colors.blue;
+      functionFontColor = Colors.white;
+    } else if (functionColorIndex == 4) {
+      functionBackgroundColor = Colors.orange;
+      functionFontColor = Colors.white;
+    } else if (functionColorIndex == 5) {
+      functionBackgroundColor = Colors.white;
+      functionFontColor = Colors.black;
+    }
+
+    if (numberColorIndex == 0) {
+      numberBackgroundColor = Colors.brown;
+      numberFontColor = Colors.white;
+    } else if (numberColorIndex == 1) {
+      numberBackgroundColor = Colors.black;
+      numberFontColor = Colors.white;
+    } else if (numberColorIndex == 2) {
+      numberBackgroundColor = Colors.red;
+      numberFontColor = Colors.white;
+    } else if (numberColorIndex == 3) {
+      numberBackgroundColor = Colors.blue;
+      numberFontColor = Colors.white;
+    } else if (numberColorIndex == 4) {
+      numberBackgroundColor = Colors.orange;
+      numberFontColor = Colors.white;
+    } else if (numberColorIndex == 5) {
+      numberBackgroundColor = Colors.white;
+      numberFontColor = Colors.black;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final setting = Provider.of<SettingModel>(context, listen: false);
     return FutureBuilder(
-      future: setting.loading.future,
+      future: Future.wait([setting.loading.future, changeThemeColor()]),
       builder: (context, snapshot) {
         if (setting.loading.isCompleted && setting.hideKeyboard) {
           animationController.value = 1;
@@ -324,12 +420,11 @@ class _ExpandKeyBoardState extends State<ExpandKeyBoard> with TickerProviderStat
     List<Widget> button = [];
     const fontSize = 25.0;
     const iconSize = 45.0;
-    var fontColor = (Colors.grey[200])!;
 
     button.add(SignButton(
       child: const Text('sin'),
       fontSize: fontSize,
-      fontColor: fontColor,
+      fontColor: functionFontColor,
       onPressed: () {
         mathBoxController.addExpression('\\sin');
         mathBoxController.addExpression('(');
@@ -339,7 +434,7 @@ class _ExpandKeyBoardState extends State<ExpandKeyBoard> with TickerProviderStat
     button.add(SignButton(
       child: const Text('cos'),
       fontSize: fontSize,
-      fontColor: fontColor,
+      fontColor: functionFontColor,
       onPressed: () {
         mathBoxController.addExpression('\\cos');
         mathBoxController.addExpression('(');
@@ -349,7 +444,7 @@ class _ExpandKeyBoardState extends State<ExpandKeyBoard> with TickerProviderStat
     button.add(SignButton(
       child: const Text('tan'),
       fontSize: fontSize,
-      fontColor: fontColor,
+      fontColor: functionFontColor,
       onPressed: () {
         mathBoxController.addExpression('\\\\tan');
         mathBoxController.addExpression('(');
@@ -359,7 +454,7 @@ class _ExpandKeyBoardState extends State<ExpandKeyBoard> with TickerProviderStat
     button.add(SignButton(
       child: Icon(// sqrt
         const IconData(0xe90a, fontFamily: 'Keyboard'),
-        color: fontColor,
+        color: functionFontColor,
         size: iconSize,
       ),
       onPressed: () {
@@ -370,7 +465,7 @@ class _ExpandKeyBoardState extends State<ExpandKeyBoard> with TickerProviderStat
     button.add(SignButton(
       child: Icon(// exp
         const IconData(0xe905, fontFamily: 'Keyboard'),
-        color: fontColor,
+        color: functionFontColor,
         size: iconSize,
       ),
       onPressed: () {
@@ -382,7 +477,7 @@ class _ExpandKeyBoardState extends State<ExpandKeyBoard> with TickerProviderStat
     button.add(SignButton(
       child: Icon(// pow2
         const IconData(0xe909, fontFamily: 'Keyboard'),
-        color: fontColor,
+        color: functionFontColor,
         size: iconSize,
       ),
       onPressed: () {
@@ -395,7 +490,7 @@ class _ExpandKeyBoardState extends State<ExpandKeyBoard> with TickerProviderStat
     button.add(SignButton(
       child: const Text('ln'),
       fontSize: fontSize,
-      fontColor: fontColor,
+      fontColor: functionFontColor,
       onPressed: () {
         mathBoxController.addExpression('\\ln');
         mathBoxController.addExpression('(');
@@ -405,7 +500,7 @@ class _ExpandKeyBoardState extends State<ExpandKeyBoard> with TickerProviderStat
     button.add(SignButton(
       child: Icon(// arcsin
         const IconData(0xe903, fontFamily: 'Keyboard'),
-        color: fontColor,
+        color: functionFontColor,
         size: iconSize,
       ),
       onPressed: () {
@@ -417,7 +512,7 @@ class _ExpandKeyBoardState extends State<ExpandKeyBoard> with TickerProviderStat
     button.add(SignButton(
       child: Icon(// arccos
         const IconData(0xe902, fontFamily: 'Keyboard'),
-        color: fontColor,
+        color: functionFontColor,
         size: iconSize,
       ),
       onPressed: () {
@@ -429,7 +524,7 @@ class _ExpandKeyBoardState extends State<ExpandKeyBoard> with TickerProviderStat
     button.add(SignButton(
       child: Icon(// arctan
         const IconData(0xe904, fontFamily: 'Keyboard'),
-        color: fontColor,
+        color: functionFontColor,
         size: iconSize,
       ),
       onPressed: () {
@@ -441,7 +536,7 @@ class _ExpandKeyBoardState extends State<ExpandKeyBoard> with TickerProviderStat
     button.add(SignButton(
       child: Icon(// nrt
         const IconData(0xe908, fontFamily: 'Keyboard'),
-        color: fontColor,
+        color: functionFontColor,
         size: iconSize,
       ),
       onPressed: () {
@@ -452,7 +547,7 @@ class _ExpandKeyBoardState extends State<ExpandKeyBoard> with TickerProviderStat
     button.add(SignButton(
       child: Icon(// abs
         const IconData(0xe901, fontFamily: 'Keyboard'),
-        color: fontColor,
+        color: functionFontColor,
         size: iconSize,
       ),
       onPressed: () {
@@ -463,7 +558,7 @@ class _ExpandKeyBoardState extends State<ExpandKeyBoard> with TickerProviderStat
     button.add(SignButton(
       child: const Text('('),
       fontSize: fontSize,
-      fontColor: fontColor,
+      fontColor: functionFontColor,
       onPressed: () {
         mathBoxController.addExpression('(');
       },
@@ -472,7 +567,7 @@ class _ExpandKeyBoardState extends State<ExpandKeyBoard> with TickerProviderStat
     button.add(SignButton(
       child: const Text(')'),
       fontSize: fontSize,
-      fontColor: fontColor,
+      fontColor: functionFontColor,
       onPressed: () {
         mathBoxController.addExpression(')');
       },
@@ -481,11 +576,11 @@ class _ExpandKeyBoardState extends State<ExpandKeyBoard> with TickerProviderStat
     button.add(SignButton(
       child: Icon(// *10^n
         const IconData(0xe900, fontFamily: 'Keyboard'),
-        color: fontColor,
+        color: functionFontColor,
         size: iconSize,
       ),
       fontSize: fontSize,
-      fontColor: fontColor,
+      fontColor: functionFontColor,
       onPressed: () {
         mathBoxController.addExpression('E');
       },
@@ -494,7 +589,7 @@ class _ExpandKeyBoardState extends State<ExpandKeyBoard> with TickerProviderStat
     button.add(SignButton(
       child: const Text('log'),
       fontSize: fontSize,
-      fontColor: fontColor,
+      fontColor: functionFontColor,
       onPressed: () {
         mathBoxController.addExpression('log');
         mathBoxController.addExpression('_');
@@ -507,7 +602,7 @@ class _ExpandKeyBoardState extends State<ExpandKeyBoard> with TickerProviderStat
     button.add(SignButton(
       child: Icon(// expo
         const IconData(0xe906, fontFamily: 'Keyboard'),
-        color: fontColor,
+        color: functionFontColor,
         size: iconSize,
       ),
       onPressed: () {
@@ -526,7 +621,7 @@ class _ExpandKeyBoardState extends State<ExpandKeyBoard> with TickerProviderStat
     ));
 
     button.add(SignButton(
-      child: Icon(Icons.arrow_back, color: fontColor,),
+      child: Icon(Icons.arrow_back, color: functionFontColor,),
       onPressed: () {
         mathBoxController.addKey('Left');
       },
@@ -550,7 +645,7 @@ class _ExpandKeyBoardState extends State<ExpandKeyBoard> with TickerProviderStat
     ));
 
     button.add(SignButton(
-      child: Icon(Icons.arrow_forward, color: fontColor,),
+      child: Icon(Icons.arrow_forward, color: functionFontColor,),
       onPressed: () {
         mathBoxController.addKey('Right');
       },
@@ -576,7 +671,7 @@ class _ExpandKeyBoardState extends State<ExpandKeyBoard> with TickerProviderStat
     button.add(SignButton(
       child: const Text('Ans'),
       fontSize: fontSize,
-      fontColor: fontColor,
+      fontColor: functionFontColor,
       onPressed: () {
         if (Provider.of<MathModel>(context, listen: false).hasHistory) {
           mathBoxController.addExpression('Ans');
@@ -593,9 +688,6 @@ class _ExpandKeyBoardState extends State<ExpandKeyBoard> with TickerProviderStat
         }
       },
     ));
-
-
-
     return button;
   }
 
