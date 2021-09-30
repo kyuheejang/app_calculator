@@ -35,8 +35,8 @@ void main() async {
     final adCollectionReference = FirebaseFirestore.instance
         .collection("ad_id").doc("ySiKuE840qZ9zWtmEDNv");
     var value = await adCollectionReference.get();
-    initialAdId = value.data()?['initialAdId'];
-    bannerAdId = value.data()?['bannerAdId'];
+    initialAdId = value.data()?['initialAdId2'];
+    bannerAdId = value.data()?['bannerAdId2'];
   } else {
     initialAdId = testInitialAdId;
     bannerAdId = testBannerAdId;
