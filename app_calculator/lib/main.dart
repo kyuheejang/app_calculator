@@ -17,8 +17,9 @@ import 'package:app_tracking_transparency/app_tracking_transparency.dart';
 String testInitialAdId = "ca-app-pub-3940256099942544/1033173712";
 String testBannerAdId = "ca-app-pub-3940256099942544/6300978111";
 
-String initialAdId = "";
-String bannerAdId = "";
+String initialMainAdId = "";
+String initialSettingAdId = "";
+String bannerSettingAdId = "";
 int functionColorIndex = 0;
 int numberColorIndex = 0;
 Color functionBackgroundColor = Colors.black87;
@@ -35,11 +36,13 @@ void main() async {
     final adCollectionReference = FirebaseFirestore.instance
         .collection("ad_id").doc("ySiKuE840qZ9zWtmEDNv");
     var value = await adCollectionReference.get();
-    initialAdId = value.data()?['initialAdId2'];
-    bannerAdId = value.data()?['bannerAdId2'];
+    initialMainAdId = value.data()?['initialAdId2'];
+    initialSettingAdId = value.data()?['initialAdId3'];
+    bannerSettingAdId = value.data()?['bannerAdId2'];
   } else {
-    initialAdId = testInitialAdId;
-    bannerAdId = testBannerAdId;
+    initialMainAdId = testInitialAdId;
+    initialSettingAdId = testInitialAdId;
+    bannerSettingAdId = testBannerAdId;
   }
 
   MobileAds.instance.initialize();
@@ -112,7 +115,7 @@ class _HomePageState extends State<HomePage>
   bool isLoaded= false;
 
   final BannerAd myBanner = BannerAd(
-    adUnitId: bannerAdId,
+    adUnitId: bannerSettingAdId,
     size: AdSize.fullBanner,
     request: const AdRequest(),
     listener: const BannerAdListener(),
@@ -122,7 +125,7 @@ class _HomePageState extends State<HomePage>
   void didChangeDependencies() {
     super.didChangeDependencies();
 
-    InterstitialAd.load(adUnitId: initialAdId,
+    InterstitialAd.load(adUnitId: initialMainAdId,
         request: const AdRequest(),
         adLoadCallback: InterstitialAdLoadCallback(
           onAdLoaded: (ad) {
@@ -175,7 +178,7 @@ class _HomePageState extends State<HomePage>
           onPressed: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => SettingPage(bannerWidget, initialAdId)),
+              MaterialPageRoute(builder: (context) => SettingPage(bannerWidget, initialSettingAdId)),
             ).then((onValue) {
               setState(() {
 
@@ -192,7 +195,7 @@ class _HomePageState extends State<HomePage>
           //   onPressed: () {
           //     Navigator.push(
           //       context,
-          //       MaterialPageRoute(builder: (context) => SettingPage(adWidget)),
+          //       MaterialPageRoute(builder: (context) => SettingPage(bannerWidget, initialMainAdId)),
           //     );
           //   },
           // ),
@@ -204,7 +207,7 @@ class _HomePageState extends State<HomePage>
           //   onPressed: () {
           //     Navigator.push(
           //       context,
-          //       MaterialPageRoute(builder: (context) => SettingPage(adWidget)),
+          //       MaterialPageRoute(builder: (context) => SettingPage(bannerWidget, initialMainAdId)),
           //     );
           //   },
           // ),

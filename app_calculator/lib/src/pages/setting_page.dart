@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'dart:math';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -11,28 +10,24 @@ import 'package:app_calculator/src/backend/math_model.dart';
 
 class SettingPage extends StatelessWidget {
 
-  SettingPage(this.bannerWidget, this.initialAdId);
+  SettingPage(this.bannerSettingWidget, this.initialSettingAdId);
 
-  final AdWidget bannerWidget;
-  final String initialAdId;
-  InterstitialAd? interstitialAd;
+  final AdWidget bannerSettingWidget;
+  final String initialSettingAdId;
+  InterstitialAd? interstitialSettingAd;
 
   @override
   Widget build(BuildContext context) {
-    var rng = Random();
-    int randomNumber = rng.nextInt(90) + 10;
-    if (randomNumber % 3 == 0) {
-      InterstitialAd.load(adUnitId: initialAdId,
-          request: const AdRequest(),
-          adLoadCallback: InterstitialAdLoadCallback(
-            onAdLoaded: (ad) {
-              interstitialAd=ad;
-              interstitialAd!.show();
-            },
-            onAdFailedToLoad: (error) {
-            },
-          ));
-    }
+    InterstitialAd.load(adUnitId: initialSettingAdId,
+        request: const AdRequest(),
+        adLoadCallback: InterstitialAdLoadCallback(
+          onAdLoaded: (ad) {
+            interstitialSettingAd=ad;
+            interstitialSettingAd!.show();
+          },
+          onAdFailedToLoad: (error) {
+          },
+        ));
 
     final mathModel = Provider.of<MathModel>(context, listen: false);
     return Scaffold(
@@ -51,7 +46,7 @@ class SettingPage extends StatelessWidget {
         physics: const NeverScrollableScrollPhysics(),
         padding: const EdgeInsets.symmetric(horizontal: 10.0),
         children: <Widget>[
-          bannerWidget,
+          bannerSettingWidget,
           const ListTile(
             leading: Text(
               'Calc Setting',
