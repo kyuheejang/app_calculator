@@ -31,7 +31,7 @@ void main() async {
   await Firebase.initializeApp();
   final status = await AppTrackingTransparency.requestTrackingAuthorization();
 
-  if kReleaseMode) { // is Release Mode ??
+  if (kReleaseMode) { // is Release Mode ??
     final adCollectionReference = FirebaseFirestore.instance
         .collection("ad_id").doc("ySiKuE840qZ9zWtmEDNv");
     var value = await adCollectionReference.get();
