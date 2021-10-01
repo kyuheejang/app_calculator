@@ -17,9 +17,9 @@ import 'package:app_tracking_transparency/app_tracking_transparency.dart';
 String testInitialAdId = "ca-app-pub-3940256099942544/1033173712";
 String testBannerAdId = "ca-app-pub-3940256099942544/6300978111";
 
-String initialMainAdId = "";
-String initialSettingAdId = "";
-String bannerSettingAdId = "";
+String mainInterAdId = "";
+String settingInterAdId = "";
+String settingBannerAdId = "";
 int functionColorIndex = 0;
 int numberColorIndex = 0;
 Color functionBackgroundColor = Colors.black87;
@@ -36,13 +36,20 @@ void main() async {
     final adCollectionReference = FirebaseFirestore.instance
         .collection("ad_id").doc("ySiKuE840qZ9zWtmEDNv");
     var value = await adCollectionReference.get();
-    initialMainAdId = value.data()?['initialAdId2'];
-    initialSettingAdId = value.data()?['initialAdId3'];
-    bannerSettingAdId = value.data()?['bannerAdId2'];
+
+    if (defaultTargetPlatform == TargetPlatform.iOS) {
+      mainInterAdId = value.data()?['iosMainInter'];
+      settingInterAdId = value.data()?['iosSettingInter'];
+      settingBannerAdId = value.data()?['iosSettingBanner'];
+    } else {
+      mainInterAdId = value.data()?['andMainInter'];
+      settingInterAdId = value.data()?['andSettingInter'];
+      settingBannerAdId = value.data()?['andSettingBanner'];
+    }
   } else {
-    initialMainAdId = testInitialAdId;
-    initialSettingAdId = testInitialAdId;
-    bannerSettingAdId = testBannerAdId;
+    mainInterAdId = testInitialAdId;
+    settingInterAdId = testInitialAdId;
+    settingBannerAdId = testBannerAdId;
   }
 
   MobileAds.instance.initialize();
@@ -115,7 +122,7 @@ class _HomePageState extends State<HomePage>
   bool isLoaded= false;
 
   final BannerAd myBanner = BannerAd(
-    adUnitId: bannerSettingAdId,
+    adUnitId: settingBannerAdId,
     size: AdSize.fullBanner,
     request: const AdRequest(),
     listener: const BannerAdListener(),
@@ -125,7 +132,7 @@ class _HomePageState extends State<HomePage>
   void didChangeDependencies() {
     super.didChangeDependencies();
 
-    InterstitialAd.load(adUnitId: initialMainAdId,
+    InterstitialAd.load(adUnitId: mainInterAdId,
         request: const AdRequest(),
         adLoadCallback: InterstitialAdLoadCallback(
           onAdLoaded: (ad) {
@@ -178,7 +185,7 @@ class _HomePageState extends State<HomePage>
           onPressed: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => SettingPage(bannerWidget, initialSettingAdId)),
+              MaterialPageRoute(builder: (context) => SettingPage(bannerWidget, settingInterAdId)),
             ).then((onValue) {
               setState(() {
 
