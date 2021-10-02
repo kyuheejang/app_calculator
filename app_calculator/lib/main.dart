@@ -29,8 +29,8 @@ Color numberBackgroundColor = Colors.black87;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
   final status = await AppTrackingTransparency.requestTrackingAuthorization();
+  await Firebase.initializeApp();
 
   if (kReleaseMode) { // is Release Mode ??
     final adCollectionReference = FirebaseFirestore.instance
