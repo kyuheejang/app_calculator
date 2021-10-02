@@ -52,7 +52,7 @@ void main() async {
     settingBannerAdId = testBannerAdId;
   }
 
-  MobileAds.instance.initialize();
+  await MobileAds.instance.initialize();
 
   runApp(const MyApp());
 }
