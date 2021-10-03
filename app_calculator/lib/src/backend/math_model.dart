@@ -7,6 +7,54 @@ import 'package:app_calculator/src/backend/latex.dart';
 class MathModel with ChangeNotifier {
   List<String> _expressionHistory = [];
   List<String> _resultHistory = [];
+  //
+  // String encodeExpressionHistory() {
+  //   String _encodedExpressionHistory = "";
+  //
+  //   for (var i = 0; i < _expressionHistory.length; i++) {
+  //     _encodedExpressionHistory += _expressionHistory[i];
+  //     if (i < _expressionHistory.length - 1) {
+  //       _encodedExpressionHistory += "@@";
+  //     }
+  //   }
+  //   return _encodedExpressionHistory;
+  // }
+  //
+  // String encodeResultHistory() {
+  //   String _encodedResultHistory = "";
+  //
+  //   for (var i = 0; i < _resultHistory.length; i++) {
+  //     _encodedResultHistory += _resultHistory[i];
+  //     if (i < _resultHistory.length - 1) {
+  //       _encodedResultHistory += "@@";
+  //     }
+  //   }
+  //   return _encodedResultHistory;
+  // }
+
+  // void decodeExpressionHistory(String _encodedExpressionHistory) {
+  //   List<String> parsedExpressionList = _encodedExpressionHistory.split("@@");
+  //   _expressionHistory = parsedExpressionList;
+  //   _expression = _encodedExpressionHistory[0];
+  // }
+  //
+  // void decodeResultHistory(String _encodedResultHistory) {
+  //   List<String> parsedResultList = _encodedResultHistory.split("@@");
+  //   _resultHistory = parsedResultList;
+  // }
+
+  String getExpression() {
+    return _expression;
+  }
+
+  String getResult() {
+    return result;
+  }
+
+  void setResult(String result) {
+    _result = result;
+  }
+
   String _expression = '';
   String _result = '';
   int _precision = 0;
@@ -38,8 +86,8 @@ class MathModel with ChangeNotifier {
   }
 
   void changeSetting({required int precision, required bool isRadMode}) {
-    this._precision = precision;
-    this._isRadMode = isRadMode;
+    _precision = precision;
+    _isRadMode = isRadMode;
   }
 
   void updateExpression(String expression) {
@@ -53,7 +101,7 @@ class MathModel with ChangeNotifier {
     } else {
       try {
         LaTexParser lp;
-        if (_resultHistory.length < 1) {
+        if (_resultHistory.isEmpty) {
           lp = LaTexParser(_expression, isRadMode: _isRadMode);
         } else {
           lp = LaTexParser(_expression.replaceAll('Ans', '{'+_resultHistory[_resultHistory.length-1].toString()+'}'), isRadMode: _isRadMode);
@@ -93,8 +141,8 @@ class MathModel with ChangeNotifier {
 }
 
 class MatrixModel with ChangeNotifier {
-  List<String> _matrixExpHistory = [];
-  String _matrixExression = "";
+  final List<String> _matrixExpHistory = [];
+  String _matrixExpression = "";
   late Matrix _matrix;
   late int _precision;
   bool _single = true;
@@ -104,8 +152,8 @@ class MatrixModel with ChangeNotifier {
   bool get square => _square;
 
   void updateExpression(String expression) {
-    _matrixExression = expression;
-    final mp = MatrixParser(_matrixExression, precision: _precision);
+    _matrixExpression = expression;
+    final mp = MatrixParser(_matrixExpression, precision: _precision);
     _matrix = mp.parse();
     _single = mp.single;
     _square = mp.square;
@@ -113,30 +161,30 @@ class MatrixModel with ChangeNotifier {
   }
 
   void calc() {
-    _matrixExpHistory.add(_matrixExression);
+    _matrixExpHistory.add(_matrixExpression);
     updateExpression(matrix2String(_matrix));
   }
 
   void norm() {
-    _matrixExpHistory.add(_matrixExression);
-    _matrixExression = _matrix.det().toString();
+    _matrixExpHistory.add(_matrixExpression);
+    _matrixExpression = _matrix.det().toString();
     _single = false;
     _square = false;
     notifyListeners();
   }
 
   void transpose() {
-    _matrixExpHistory.add(_matrixExression);
+    _matrixExpHistory.add(_matrixExpression);
     updateExpression(matrix2String(_matrix.transpose()));
   }
 
   void invert() {
-    _matrixExpHistory.add(_matrixExression);
+    _matrixExpHistory.add(_matrixExpression);
     updateExpression(matrix2String(_matrix.inverse()));
   }
 
   String display() {
-    List<int> uniCode = _matrixExression.runes.toList();
+    List<int> uniCode = _matrixExpression.runes.toList();
     for (var i = 0; i < uniCode.length; i++) {
       if (uniCode[i] == 92) {
         uniCode.insert(i, 92);

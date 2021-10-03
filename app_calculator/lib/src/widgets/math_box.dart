@@ -188,33 +188,73 @@ class MathBoxController {
 
   late WebViewController _webViewController;
   late AnimationController clearAnimationController;
+  List<String> mathBoxHistoryList = [];
 
   set webViewController(WebViewController controller) {
     _webViewController = controller;
   }
 
+  String encodeMathBoxHistory() {
+    String _encodedMathBoxHistoryList = "";
+    print(mathBoxHistoryList.toString());
+
+    for (var i = 0; i < mathBoxHistoryList.length; i++) {
+      _encodedMathBoxHistoryList += mathBoxHistoryList[i];
+      if (i < mathBoxHistoryList.length - 1) {
+        _encodedMathBoxHistoryList += "@@";
+      }
+    }
+    return _encodedMathBoxHistoryList;
+  }
+
+  void decodeMathBoxHistory(String _mathBoxHistoryList) {
+    print(_mathBoxHistoryList);
+    List<String> parsedExpressionList = _mathBoxHistoryList.split("@@");
+    mathBoxHistoryList = parsedExpressionList;
+    print(mathBoxHistoryList.toString());
+  }
+
+
+
   void addExpression(String msg, {bool isOperator = false}) {
-    _webViewController.evaluateJavascript("addCmd('$msg', {isOperator: ${isOperator.toString()}})");
+    String cmd = "addCmd('$msg', {isOperator: ${isOperator.toString()}})";
+    _webViewController.evaluateJavascript(cmd);
+    mathBoxHistoryList.add(cmd);
   }
 
   void addString(String msg) {
-    _webViewController.evaluateJavascript("addString('$msg')");
+    String cmd = "addString('$msg')";
+    _webViewController.evaluateJavascript(cmd);
+    mathBoxHistoryList.add(cmd);
   }
 
   void equal() {
-    _webViewController.evaluateJavascript("equal()");
+    String cmd = "equal()";
+    _webViewController.evaluateJavascript(cmd);
+    mathBoxHistoryList.add(cmd);
   }
 
   void addKey(String key) {
-    _webViewController.evaluateJavascript("simulateKey('$key')");
+    String cmd = "simulateKey('$key')";
+    _webViewController.evaluateJavascript(cmd);
+    mathBoxHistoryList.add(cmd);
   }
 
   void deleteExpression() {
-    _webViewController.evaluateJavascript("delString()");
+    String cmd = "delString()";
+    _webViewController.evaluateJavascript(cmd);
+    mathBoxHistoryList.removeLast();
   }
 
   void deleteAllExpression() {
     _webViewController.evaluateJavascript("delAll()");
+    mathBoxHistoryList.clear();
   }
-  
+
+  void loadSavedHistory() {
+    _webViewController.evaluateJavascript("delAll()");
+    for (var history in mathBoxHistoryList) {
+      _webViewController.evaluateJavascript(history);
+    }
+  }
 }

@@ -617,7 +617,8 @@ class _ExpandKeyBoardState extends State<ExpandKeyBoard> with TickerProviderStat
         size: 40.0,
         color: Colors.white,
       ),
-      onPressed: () {mathBoxController.addExpression('/', isOperator: true);}, onLongPress: () {  },
+      onPressed: () {
+        mathBoxController.addExpression('/', isOperator: true);},
     ));
 
     button.add(SignButton(
