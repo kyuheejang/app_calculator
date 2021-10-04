@@ -224,7 +224,7 @@ class _HomePageState extends State<HomePage>
         builder: (context) {
           return AlertDialog(
             title: const Text('Please specify a name of the formula to be saved \n \n'
-                'Operations that require input by touching the screen, such as log, do not work.'),
+                'When writing a formula to be saved, you must navigate through the function keyboard, not by touching the display.'),
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8.0)
             ),
