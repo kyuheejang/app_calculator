@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:flutter/foundation.dart';
@@ -8,13 +9,14 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:app_calculator/src/pages/setting_page.dart';
+import 'package:app_tracking_transparency/app_tracking_transparency.dart';
 
 import 'package:app_calculator/src/widgets/math_box.dart';
 import 'package:app_calculator/src/widgets/result.dart';
 import 'package:app_calculator/src/widgets/keyboard.dart';
 import 'package:app_calculator/src/backend/math_model.dart';
-import 'package:app_calculator/src/pages/setting_page.dart';
-import 'package:app_tracking_transparency/app_tracking_transparency.dart';
+
 
 String testInitialAdId = "ca-app-pub-3940256099942544/1033173712";
 String testBannerAdId = "ca-app-pub-3940256099942544/6300978111";
