@@ -8,6 +8,180 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:app_calculator/src/backend/math_model.dart';
 
+class SettingPage extends StatelessWidget {
+
+  SettingPage(this.bannerSettingWidget, this.initialSettingAdId);
+
+  final AdWidget bannerSettingWidget;
+  final String initialSettingAdId;
+  InterstitialAd? interstitialSettingAd;
+
+  @override
+  Widget build(BuildContext context) {
+    InterstitialAd.load(adUnitId: initialSettingAdId,
+        request: const AdRequest(),
+        adLoadCallback: InterstitialAdLoadCallback(
+          onAdLoaded: (ad) {
+            interstitialSettingAd=ad;
+            interstitialSettingAd!.show();
+          },
+          onAdFailedToLoad: (error) {
+          },
+        ));
+
+    final mathModel = Provider.of<MathModel>(context, listen: false);
+    return Scaffold(
+      appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back,),
+          onPressed: () {
+            mathModel.calcNumber();
+            Navigator.pop(context);
+          },
+        ),
+        title: const Text('Settings',),
+      ),
+      body: settingPage(),
+    );
+  }
+
+  _launchURL(String url) async {
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Could not launch $url';
+    }
+  }
+
+  Widget settingPage() {
+    return ListView(
+      itemExtent: 60.0,
+      physics: const NeverScrollableScrollPhysics(),
+      padding: const EdgeInsets.symmetric(horizontal: 10.0),
+      children: <Widget>[
+        const ListTile(
+          leading: Text(
+            'Calc Setting',
+            style: TextStyle(
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ),
+        Consumer<SettingModel>(
+          builder: (context, setmodel, _) => ListTile(
+            title: ToggleButtons(
+              children: const <Widget>[
+                Text('RAD'),
+                Text('DEG'),
+              ],
+              constraints: const BoxConstraints(
+                minWidth: 100,
+                minHeight: 40,
+              ),
+              isSelected: [setmodel.isRadMode, !setmodel.isRadMode],
+              onPressed: (index) {
+                setmodel.changeRadMode((index==0)?true:false);
+              },
+            ),
+          ),
+        ),
+        SizedBox(height: 100),
+        Consumer<SettingModel>(
+          builder: (context, setmodel, _) => ListTile(
+            title: const Text(
+              'Calc Precision',
+              style: TextStyle(
+                fontWeight: FontWeight.w700,
+              ),),
+            subtitle: Slider(
+              value: setmodel.precision.toDouble(),
+              min: 0.0,
+              max: 10.0,
+              label: "${setmodel.precision.toInt()}",
+              divisions: 10,
+              onChanged: (val) {
+                setmodel.changeSlider(val);
+              },
+            ),
+            trailing: Text('${setmodel.precision.toInt()}'),
+          ),
+        ),
+        const SizedBox(height: 100),
+        const ListTile(
+          leading: Text(
+            'Change color: function keyboard',
+            style: TextStyle(
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ),
+        Consumer<SettingModel>(
+          builder: (context, setmodel, _) => ListTile(
+            title: ToggleButtons(
+              children: const <Widget>[
+                Text('Brown'),
+                Text('Black'),
+                Text('Red'),
+                Text('Blue'),
+                Text('Orange'),
+              ],
+              constraints: const BoxConstraints(
+                minWidth: 55,
+                minHeight: 40,
+              ),
+              isSelected: [
+                setmodel.functionColorList[0],
+                setmodel.functionColorList[1],
+                setmodel.functionColorList[2],
+                setmodel.functionColorList[3],
+                setmodel.functionColorList[4],
+              ],
+              onPressed: (index) {
+                setmodel.changeFunctionColor(index);
+              },
+            ),
+          ),
+        ),const SizedBox(height: 100),
+        const ListTile(
+          leading: Text(
+            'Change color: number keyboard',
+            style: TextStyle(
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ),
+        Consumer<SettingModel>(
+          builder: (context, setmodel, _) => ListTile(
+            title: ToggleButtons(
+              children: const <Widget>[
+                Text('Brown'),
+                Text('Black'),
+                Text('Red'),
+                Text('Blue'),
+                Text('Orange'),
+              ],
+              constraints: const BoxConstraints(
+                minWidth: 55,
+                minHeight: 40,
+              ),
+              isSelected: [
+                setmodel.numberColorList[0],
+                setmodel.numberColorList[1],
+                setmodel.numberColorList[2],
+                setmodel.numberColorList[3],
+                setmodel.numberColorList[4],
+              ],
+              onPressed: (index) {
+                setmodel.changeNumberColor(index);
+              },
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
 class SettingModel with ChangeNotifier {
   double precision = 10;
   bool isRadMode = true;

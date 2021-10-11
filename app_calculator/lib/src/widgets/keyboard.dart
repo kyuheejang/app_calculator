@@ -78,13 +78,17 @@ class SignButton extends StatelessWidget {
 
 
 const aspectRatio = 1.2;
+Color functionBackgroundColor = Colors.black;
+Color numberBackgroundColor = Colors.black;
 
 class MathKeyBoard extends StatelessWidget {
 
-  Color functionBackgroundColor = Colors.black;
-  Color numberBackgroundColor = Colors.black;
+  void initColor() async{
+    changeThemeColor();
+  }
 
   List<Widget> _buildLowButton(MathBoxController mathBoxController) {
+    initColor();
     List<Widget> button = [];
 
     for (var i = 7; i <= 9; i++) {
@@ -248,8 +252,6 @@ class MathKeyBoard extends StatelessWidget {
 
 const animationConstant = 8.0;
 
-
-
 class AtanCurve extends Curve {
   @override
   double transform(double t) => atan(animationConstant*2*t-animationConstant)/(2*atan(animationConstant))+0.5;
@@ -257,12 +259,12 @@ class AtanCurve extends Curve {
 
 class ExpandKeyBoard extends StatefulWidget {
 
-  Color functionBackgroundColor = Colors.black87;
-  Color numberBackgroundColor = Colors.black87;
-
   @override
   _ExpandKeyBoardState createState() => _ExpandKeyBoardState();
 }
+
+Color functionFontColor = Colors.black87;
+Color numberFontColor = Colors.black87;
 
 class _ExpandKeyBoardState extends State<ExpandKeyBoard> with TickerProviderStateMixin {
   late AnimationController animationController;
@@ -270,10 +272,9 @@ class _ExpandKeyBoardState extends State<ExpandKeyBoard> with TickerProviderStat
   late Animation arrowAnimation;
   late double _height;
 
-  Color functionFontColor = Colors.black87;
-  Color functionBackgroundColor = Colors.black87;
-  Color numberFontColor = Colors.black87;
-  Color numberBackgroundColor = Colors.black87;
+  void initColor() async {
+    changeThemeColor();
+  }
 
   @override
   void didChangeDependencies() {
@@ -286,7 +287,7 @@ class _ExpandKeyBoardState extends State<ExpandKeyBoard> with TickerProviderStat
     arrowAnimation = Tween<double>(begin: 15.0, end: 35.0).animate(curve);
   }
 
-  Widget _buildAnimation(BuildContext context, Widget? child) {
+  Widget _buildAnimation(BuildContext context, Widget? child){
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 0.0),
       child: Material(

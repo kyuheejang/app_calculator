@@ -11,6 +11,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:app_calculator/src/pages/setting_page.dart';
 import 'package:app_tracking_transparency/app_tracking_transparency.dart';
+import 'package:flutter_icons/flutter_icons.dart';
 
 import 'package:app_calculator/src/widgets/math_box.dart';
 import 'package:app_calculator/src/widgets/result.dart';
@@ -21,7 +22,6 @@ import 'package:app_calculator/src/backend/math_model.dart';
 String testInitialAdId = "ca-app-pub-3940256099942544/1033173712";
 String testBannerAdId = "ca-app-pub-3940256099942544/6300978111";
 
-String mainInterAdId = "";
 String settingInterAdId = "";
 String formulaSaveInterAdId = "";
 String formulaLoadInterAdId = "";
@@ -41,6 +41,12 @@ class PushNotification {
   String? body;
 }
 
+final BannerAd myBanner = BannerAd(
+  adUnitId: settingBannerAdId,
+  size: AdSize.fullBanner,
+  request: const AdRequest(),
+  listener: const BannerAdListener(),
+);
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -56,20 +62,17 @@ void main() async {
     var value = await adCollectionReference.get();
 
     if (defaultTargetPlatform == TargetPlatform.iOS) {
-      mainInterAdId = value.data()?['iosMainInter'];
       settingInterAdId = value.data()?['iosSettingInter'];
       settingBannerAdId = value.data()?['iosSettingBanner'];
       formulaSaveInterAdId = value.data()?['iosFormulaSaveInter'];
       formulaLoadInterAdId = value.data()?['iosFormulaLoadInter'];
     } else {
-      mainInterAdId = value.data()?['andMainInter'];
       settingInterAdId = value.data()?['andSettingInter'];
       settingBannerAdId = value.data()?['andSettingBanner'];
       formulaSaveInterAdId = value.data()?['andFormulaSaveInter'];
       formulaLoadInterAdId = value.data()?['andFormulaLoadInter'];
     }
   } else {
-    mainInterAdId = testInitialAdId;
     settingInterAdId = testInitialAdId;
     formulaSaveInterAdId = testInitialAdId;
     formulaLoadInterAdId = testInitialAdId;
@@ -77,7 +80,7 @@ void main() async {
   }
 
   await MobileAds.instance.initialize();
-
+  myBanner.load();
 
   runApp(const MyApp());
 }
@@ -144,14 +147,17 @@ class _HomePageState extends State<HomePage>
 
   // 시작 광고
   InterstitialAd? interstitialAd;
-  bool isLoaded= false;
 
-  final BannerAd myBanner = BannerAd(
-    adUnitId: settingBannerAdId,
-    size: AdSize.fullBanner,
-    request: const AdRequest(),
-    listener: const BannerAdListener(),
-  );
+  // 세팅 광고
+  InterstitialAd? settingInterAd;
+
+  // 수식 save 광고
+  InterstitialAd? saveInterAd;
+
+  // 수식 load 광고
+  InterstitialAd? loadInterAd;
+
+  bool isLoaded= false;
 
   // push
   late final FirebaseMessaging _messaging;
@@ -199,20 +205,6 @@ class _HomePageState extends State<HomePage>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-
-    InterstitialAd.load(adUnitId: mainInterAdId,
-        request: const AdRequest(),
-        adLoadCallback: InterstitialAdLoadCallback(
-          onAdLoaded: (ad) {
-            setState(() {
-              isLoaded=true;
-              interstitialAd=ad;
-              interstitialAd!.show();
-            });
-          },
-          onAdFailedToLoad: (error) {
-          },
-        ));
   }
 
   final Server _server = Server();
@@ -231,12 +223,12 @@ class _HomePageState extends State<HomePage>
                 borderRadius: BorderRadius.circular(8.0)
             ),
             content: TextField(
+              controller: TextEditingController(text: ""),
               onChanged: (value) {
                 setState(() {
                   saveName = value;
                 });
               },
-              controller: _textFieldController,
               decoration: const InputDecoration(hintText: ""),
             ),
             actions: <Widget>[
@@ -274,11 +266,12 @@ class _HomePageState extends State<HomePage>
                           onAdLoaded: (ad) {
                             setState(() {
                               isLoaded=true;
-                              interstitialAd=ad;
-                              interstitialAd!.show();
+                              saveInterAd=ad;
+                              saveInterAd!.show();
                             });
                           },
                           onAdFailedToLoad: (error) {
+                            saveInterAd = null;
                           },
                         ));
 
@@ -379,11 +372,12 @@ class _HomePageState extends State<HomePage>
                                           onAdLoaded: (ad) {
                                             setState(() {
                                               isLoaded=true;
-                                              interstitialAd=ad;
-                                              interstitialAd!.show();
+                                              loadInterAd=ad;
+                                              loadInterAd!.show();
                                             });
                                           },
                                           onAdFailedToLoad: (error) {
+                                            loadInterAd = null;
                                           },
                                         ));
                                     final mathModel = Provider.of<MathModel>(context, listen: false);
@@ -498,7 +492,6 @@ class _HomePageState extends State<HomePage>
   void initState() {
     super.initState();
     _server.start();
-    myBanner.load();
     registerNotification();
 
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
@@ -516,75 +509,235 @@ class _HomePageState extends State<HomePage>
     super.dispose();
   }
 
+  Widget settingPage() {
+
+    final AdWidget bannerWidget = AdWidget(ad: myBanner);
+    return ListView(
+      itemExtent: 60.0,
+      physics: const NeverScrollableScrollPhysics(),
+      padding: const EdgeInsets.symmetric(horizontal: 10.0),
+      children: <Widget>[
+        const ListTile(
+          leading: Text(
+            'Calc Setting',
+            style: TextStyle(
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ),
+        Consumer<SettingModel>(
+          builder: (context, setmodel, _) => ListTile(
+            title: ToggleButtons(
+              children: const <Widget>[
+                Text('RAD'),
+                Text('DEG'),
+              ],
+              constraints: const BoxConstraints(
+                minWidth: 100,
+                minHeight: 40,
+              ),
+              isSelected: [setmodel.isRadMode, !setmodel.isRadMode],
+              onPressed: (index) {
+                setmodel.changeRadMode((index==0)?true:false);
+              },
+            ),
+          ),
+        ),
+        SizedBox(height: 100),
+        Consumer<SettingModel>(
+          builder: (context, setmodel, _) => ListTile(
+            title: const Text(
+              'Calc Precision',
+              style: TextStyle(
+                fontWeight: FontWeight.w700,
+              ),),
+            subtitle: Slider(
+              value: setmodel.precision.toDouble(),
+              min: 0.0,
+              max: 10.0,
+              label: "${setmodel.precision.toInt()}",
+              divisions: 10,
+              onChanged: (val) {
+                setmodel.changeSlider(val);
+              },
+            ),
+            trailing: Text('${setmodel.precision.toInt()}'),
+          ),
+        ),
+        const SizedBox(height: 100),
+        const ListTile(
+          leading: Text(
+            'Change color: function keyboard',
+            style: TextStyle(
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ),
+        Consumer<SettingModel>(
+          builder: (context, setmodel, _) => ListTile(
+            title: ToggleButtons(
+              children: const <Widget>[
+                Text('Brown'),
+                Text('Black'),
+                Text('Red'),
+                Text('Blue'),
+                Text('Orange'),
+              ],
+              constraints: const BoxConstraints(
+                minWidth: 55,
+                minHeight: 40,
+              ),
+              isSelected: [
+                setmodel.functionColorList[0],
+                setmodel.functionColorList[1],
+                setmodel.functionColorList[2],
+                setmodel.functionColorList[3],
+                setmodel.functionColorList[4],
+              ],
+              onPressed: (index) {
+                setmodel.changeFunctionColor(index);
+              },
+            ),
+          ),
+        ),const SizedBox(height: 100),
+        const ListTile(
+          leading: Text(
+            'Change color: number keyboard',
+            style: TextStyle(
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ),
+        Consumer<SettingModel>(
+          builder: (context, setmodel, _) => ListTile(
+            title: ToggleButtons(
+              children: const <Widget>[
+                Text('Brown'),
+                Text('Black'),
+                Text('Red'),
+                Text('Blue'),
+                Text('Orange'),
+              ],
+              constraints: const BoxConstraints(
+                minWidth: 55,
+                minHeight: 40,
+              ),
+              isSelected: [
+                setmodel.numberColorList[0],
+                setmodel.numberColorList[1],
+                setmodel.numberColorList[2],
+                setmodel.numberColorList[3],
+                setmodel.numberColorList[4],
+              ],
+              onPressed: (index) {
+                setmodel.changeNumberColor(index);
+              },
+            ),
+          ),
+        ),
+        bannerWidget
+      ],
+    );
+  }
+
+  final PageController pageController = PageController(initialPage: 0);
+  int _selectedIndex=0;
+
+  void _onItemTapped(int index) {
+    setState(() {
+      if (index == 0) {
+        _selectedIndex = 0;
+      } else if (index == 1) {
+        _selectedIndex = 1;
+        InterstitialAd.load(adUnitId: settingInterAdId,
+            request: const AdRequest(),
+            adLoadCallback: InterstitialAdLoadCallback(
+              onAdLoaded: (ad) {
+                settingInterAd=ad;
+                settingInterAd!.show();
+              },
+              onAdFailedToLoad: (error) {
+                settingInterAd=null;
+              },
+            ));
+        settingPage();
+      } else if (index == 2) {
+        index = 0;
+        _displayTextInputDialog(context);
+      } else if (index == 3) {
+        index = 0;
+        showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: Text('Saved formula list'),
+                content: setupAlertDialoadContainer(),
+              );
+            });
+      }
+      _selectedIndex=index;
+      pageController.animateToPage(
+        index,
+        curve: Curves.easeIn,
+        duration: const Duration(milliseconds: 100),);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
 
-    final AdWidget bannerWidget = AdWidget(ad: myBanner);
-
     return Scaffold(
       resizeToAvoidBottomInset : false,
-      appBar: AppBar(
-        elevation: 0.0,
-        backgroundColor: Colors.transparent,
-        leading: IconButton(
-          icon: const FaIcon(
-            FontAwesomeIcons.cogs,
-            color: Colors.black,
-          ),
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => SettingPage(bannerWidget, settingInterAdId)),
-            ).then((onValue) {
-              setState(() {
-
-              });
-            });
-          },
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(15.0),
+        child: AppBar(
+          elevation: 0.0,
+          backgroundColor: Colors.transparent,
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(
-              FontAwesomeIcons.save,
-              color: Colors.black,
+      ),
+      body: PageView(
+        physics:const NeverScrollableScrollPhysics(),
+        controller: pageController,
+        children: [
+            Column(
+            children: <Widget>[
+            Expanded(
+              flex: 10,
+              child: Stack(
+                alignment: Alignment.bottomCenter,
+                children: const <Widget>[
+                  MathBox(),
+                  SlidComponent(),
+                ],
+              ),
             ),
-            onPressed: () {
-              _displayTextInputDialog(context);
-            },
+            MathKeyBoard()
+            ],
           ),
-          IconButton(
-            icon: const Icon(
-              FontAwesomeIcons.hdd,
-              color: Colors.black,
-            ),
-            onPressed: () {
-              showDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return AlertDialog(
-                      title: Text('Saved formula list'),
-                      content: setupAlertDialoadContainer(),
-                    );
-                  });
-            },
-          ),
+          settingPage(),
         ],
       ),
-      body: Column(
-        children: <Widget>[
-          Expanded(
-            child: Stack(
-              alignment: Alignment.bottomCenter,
-              children: const <Widget>[
-                MathBox(),
-                SlidComponent(),
-              ],
+      bottomNavigationBar: BottomNavigationBar(onTap: _onItemTapped,
+          currentIndex: _selectedIndex,
+          type: BottomNavigationBarType.fixed,
+          items: const <BottomNavigationBarItem>[
+            BottomNavigationBarItem(
+                icon: Icon(FlutterIcons.md_calculator_ion),
+                title: Text('calculator')
             ),
-          ),
-          MathKeyBoard(),
-          const Padding(padding: EdgeInsets.only(bottom:40)),
-        ],
-      ),
+            BottomNavigationBarItem(
+                icon: Icon(FlutterIcons.setting_ant),
+                title: Text('setting')
+            ),
+            BottomNavigationBarItem(
+                icon: Icon(FontAwesomeIcons.save,),
+                title: Text('save')
+            ),
+            BottomNavigationBarItem(
+                icon: Icon(FontAwesomeIcons.download),
+                title: Text('load')
+            ),
+          ]),
     );
   }
 }
