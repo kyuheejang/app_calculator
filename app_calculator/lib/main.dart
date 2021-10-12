@@ -41,6 +41,15 @@ class PushNotification {
   String? body;
 }
 
+// 세팅 광고
+InterstitialAd? settingInterAd;
+
+// 수식 save 광고
+InterstitialAd? saveInterAd;
+
+// 수식 load 광고
+InterstitialAd? loadInterAd;
+
 final BannerAd myBanner = BannerAd(
   adUnitId: settingBannerAdId,
   size: AdSize.fullBanner,
@@ -81,6 +90,81 @@ void main() async {
 
   await MobileAds.instance.initialize();
   myBanner.load();
+
+  await InterstitialAd.load(adUnitId: settingInterAdId,
+      request: const AdRequest(),
+      adLoadCallback: InterstitialAdLoadCallback(
+        onAdLoaded: (ad) {
+          settingInterAd=ad;
+        },
+        onAdFailedToLoad: (error) {
+          settingInterAd=null;
+        },
+      ));
+
+  settingInterAd?.fullScreenContentCallback = FullScreenContentCallback(
+    onAdShowedFullScreenContent: (InterstitialAd ad) =>
+        print('$ad onAdShowedFullScreenContent.'),
+    onAdDismissedFullScreenContent: (InterstitialAd ad) {
+      print('$ad onAdDismissedFullScreenContent.');
+      ad.dispose();
+    },
+    onAdFailedToShowFullScreenContent: (InterstitialAd ad, AdError error) {
+      print('$ad onAdFailedToShowFullScreenContent: $error');
+      ad.dispose();
+    },
+    onAdImpression: (InterstitialAd ad) => print('$ad impression occurred.'),
+  );
+
+  await InterstitialAd.load(adUnitId: formulaSaveInterAdId,
+      request: const AdRequest(),
+      adLoadCallback: InterstitialAdLoadCallback(
+        onAdLoaded: (ad) {
+          saveInterAd=ad;
+        },
+        onAdFailedToLoad: (error) {
+          saveInterAd = null;
+        },
+      ));
+
+  saveInterAd?.fullScreenContentCallback = FullScreenContentCallback(
+    onAdShowedFullScreenContent: (InterstitialAd ad) =>
+        print('$ad onAdShowedFullScreenContent.'),
+    onAdDismissedFullScreenContent: (InterstitialAd ad) {
+      print('$ad onAdDismissedFullScreenContent.');
+      ad.dispose();
+    },
+    onAdFailedToShowFullScreenContent: (InterstitialAd ad, AdError error) {
+      print('$ad onAdFailedToShowFullScreenContent: $error');
+      ad.dispose();
+    },
+    onAdImpression: (InterstitialAd ad) => print('$ad impression occurred.'),
+  );
+
+  await InterstitialAd.load(adUnitId: formulaLoadInterAdId,
+      request: const AdRequest(),
+      adLoadCallback: InterstitialAdLoadCallback(
+        onAdLoaded: (ad) {
+          loadInterAd=ad;
+        },
+        onAdFailedToLoad: (error) {
+          loadInterAd = null;
+        },
+      ));
+
+  loadInterAd?.fullScreenContentCallback = FullScreenContentCallback(
+    onAdShowedFullScreenContent: (InterstitialAd ad) =>
+        print('$ad onAdShowedFullScreenContent.'),
+    onAdDismissedFullScreenContent: (InterstitialAd ad) {
+      print('$ad onAdDismissedFullScreenContent.');
+      ad.dispose();
+    },
+    onAdFailedToShowFullScreenContent: (InterstitialAd ad, AdError error) {
+      print('$ad onAdFailedToShowFullScreenContent: $error');
+      ad.dispose();
+    },
+    onAdImpression: (InterstitialAd ad) => print('$ad impression occurred.'),
+  );
 
   runApp(const MyApp());
 }
@@ -145,17 +229,6 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage>
     with SingleTickerProviderStateMixin {
 
-  // 시작 광고
-  InterstitialAd? interstitialAd;
-
-  // 세팅 광고
-  InterstitialAd? settingInterAd;
-
-  // 수식 save 광고
-  InterstitialAd? saveInterAd;
-
-  // 수식 load 광고
-  InterstitialAd? loadInterAd;
 
   bool isLoaded= false;
 
@@ -212,13 +285,18 @@ class _HomePageState extends State<HomePage>
   final TextEditingController _textFieldController = TextEditingController();
 
   Future<void> _displayTextInputDialog(BuildContext context) async {
+
+    if (saveInterAd != null) {
+      await saveInterAd!.show();
+    }
+
     String saveName = "";
-    return showDialog(
+
+    return await showDialog(
         context: context,
         builder: (context) {
           return AlertDialog(
-            title: const Text('Please specify a name of the formula to be saved \n \n'
-                'When writing a formula to be saved, you must navigate through the function keyboard, not by touching the display.'),
+            title: const Text('formula name'),
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8.0)
             ),
@@ -259,21 +337,6 @@ class _HomePageState extends State<HomePage>
                           'Cannot store more than 10 formulas'
                       );
                     }
-
-                    InterstitialAd.load(adUnitId: formulaSaveInterAdId,
-                        request: const AdRequest(),
-                        adLoadCallback: InterstitialAdLoadCallback(
-                          onAdLoaded: (ad) {
-                            setState(() {
-                              isLoaded=true;
-                              saveInterAd=ad;
-                              saveInterAd!.show();
-                            });
-                          },
-                          onAdFailedToLoad: (error) {
-                            saveInterAd = null;
-                          },
-                        ));
 
                     // 수식이랑 수식 이름 저장
                     mathModelNameList.add(saveName);
@@ -366,20 +429,6 @@ class _HomePageState extends State<HomePage>
                                 child: Text('OK'),
                                 onPressed: () {
                                   setState(() {
-                                    InterstitialAd.load(adUnitId: formulaLoadInterAdId,
-                                        request: const AdRequest(),
-                                        adLoadCallback: InterstitialAdLoadCallback(
-                                          onAdLoaded: (ad) {
-                                            setState(() {
-                                              isLoaded=true;
-                                              loadInterAd=ad;
-                                              loadInterAd!.show();
-                                            });
-                                          },
-                                          onAdFailedToLoad: (error) {
-                                            loadInterAd = null;
-                                          },
-                                        ));
                                     final mathModel = Provider.of<MathModel>(context, listen: false);
                                     mathModel.updateExpression(expressionList[index]);
                                     mathModel.setResult(resultList[index]);
@@ -509,7 +558,142 @@ class _HomePageState extends State<HomePage>
     super.dispose();
   }
 
-  Widget settingPage() {
+  Future<ListView> settingPage(BuildContext context) async {
+
+    if (settingInterAd != null) {
+      await settingInterAd!.show();
+    }
+
+    final AdWidget bannerWidget = AdWidget(ad: myBanner);
+    return ListView(
+      itemExtent: 60.0,
+      physics: const NeverScrollableScrollPhysics(),
+      padding: const EdgeInsets.symmetric(horizontal: 10.0),
+      children: <Widget>[
+        const ListTile(
+          leading: Text(
+            'Calc Setting',
+            style: TextStyle(
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ),
+        Consumer<SettingModel>(
+          builder: (context, setmodel, _) => ListTile(
+            title: ToggleButtons(
+              children: const <Widget>[
+                Text('RAD'),
+                Text('DEG'),
+              ],
+              constraints: const BoxConstraints(
+                minWidth: 100,
+                minHeight: 40,
+              ),
+              isSelected: [setmodel.isRadMode, !setmodel.isRadMode],
+              onPressed: (index) {
+                setmodel.changeRadMode((index==0)?true:false);
+              },
+            ),
+          ),
+        ),
+        SizedBox(height: 100),
+        Consumer<SettingModel>(
+          builder: (context, setmodel, _) => ListTile(
+            title: const Text(
+              'Calc Precision',
+              style: TextStyle(
+                fontWeight: FontWeight.w700,
+              ),),
+            subtitle: Slider(
+              value: setmodel.precision.toDouble(),
+              min: 0.0,
+              max: 10.0,
+              label: "${setmodel.precision.toInt()}",
+              divisions: 10,
+              onChanged: (val) {
+                setmodel.changeSlider(val);
+              },
+            ),
+            trailing: Text('${setmodel.precision.toInt()}'),
+          ),
+        ),
+        const SizedBox(height: 100),
+        const ListTile(
+          leading: Text(
+            'Change color: function keyboard',
+            style: TextStyle(
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ),
+        Consumer<SettingModel>(
+          builder: (context, setmodel, _) => ListTile(
+            title: ToggleButtons(
+              children: const <Widget>[
+                Text('Brown'),
+                Text('Black'),
+                Text('Red'),
+                Text('Blue'),
+                Text('Orange'),
+              ],
+              constraints: const BoxConstraints(
+                minWidth: 55,
+                minHeight: 40,
+              ),
+              isSelected: [
+                setmodel.functionColorList[0],
+                setmodel.functionColorList[1],
+                setmodel.functionColorList[2],
+                setmodel.functionColorList[3],
+                setmodel.functionColorList[4],
+              ],
+              onPressed: (index) {
+                setmodel.changeFunctionColor(index);
+              },
+            ),
+          ),
+        ),const SizedBox(height: 100),
+        const ListTile(
+          leading: Text(
+            'Change color: number keyboard',
+            style: TextStyle(
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ),
+        Consumer<SettingModel>(
+          builder: (context, setmodel, _) => ListTile(
+            title: ToggleButtons(
+              children: const <Widget>[
+                Text('Brown'),
+                Text('Black'),
+                Text('Red'),
+                Text('Blue'),
+                Text('Orange'),
+              ],
+              constraints: const BoxConstraints(
+                minWidth: 55,
+                minHeight: 40,
+              ),
+              isSelected: [
+                setmodel.numberColorList[0],
+                setmodel.numberColorList[1],
+                setmodel.numberColorList[2],
+                setmodel.numberColorList[3],
+                setmodel.numberColorList[4],
+              ],
+              onPressed: (index) {
+                setmodel.changeNumberColor(index);
+              },
+            ),
+          ),
+        ),
+        bannerWidget
+      ],
+    );
+  }
+
+  Widget settingPage2() {
 
     final AdWidget bannerWidget = AdWidget(ad: myBanner);
     return ListView(
@@ -643,44 +827,41 @@ class _HomePageState extends State<HomePage>
   final PageController pageController = PageController(initialPage: 0);
   int _selectedIndex=0;
 
-  void _onItemTapped(int index) {
+  void _onItemTapped (int index) async {
+
     setState(() {
       if (index == 0) {
         _selectedIndex = 0;
       } else if (index == 1) {
         _selectedIndex = 1;
-        InterstitialAd.load(adUnitId: settingInterAdId,
-            request: const AdRequest(),
-            adLoadCallback: InterstitialAdLoadCallback(
-              onAdLoaded: (ad) {
-                settingInterAd=ad;
-                settingInterAd!.show();
-              },
-              onAdFailedToLoad: (error) {
-                settingInterAd=null;
-              },
-            ));
-        settingPage();
+        settingPage(context);
       } else if (index == 2) {
         index = 0;
         _displayTextInputDialog(context);
       } else if (index == 3) {
         index = 0;
-        showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return AlertDialog(
-                title: Text('Saved formula list'),
-                content: setupAlertDialoadContainer(),
-              );
-            });
+        _displaySavedListDialog(context);
       }
       _selectedIndex=index;
-      pageController.animateToPage(
-        index,
-        curve: Curves.easeIn,
-        duration: const Duration(milliseconds: 100),);
     });
+    pageController.animateToPage(
+      index,
+      curve: Curves.easeIn,
+      duration: const Duration(milliseconds: 100),);
+  }
+
+  Future<void> _displaySavedListDialog(BuildContext context) async {
+    if (loadInterAd != null) {
+      await loadInterAd!.show();
+    }
+    await showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('formula list'),
+            content: setupAlertDialoadContainer(),
+          );
+        });
   }
 
   @override
@@ -714,7 +895,7 @@ class _HomePageState extends State<HomePage>
             MathKeyBoard()
             ],
           ),
-          settingPage(),
+          settingPage2(),
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(onTap: _onItemTapped,
