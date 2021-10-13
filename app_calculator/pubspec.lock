@@ -92,6 +92,20 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "3.0.1"
+  csv:
+    dependency: transitive
+    description:
+      name: csv
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "5.0.0"
+  csv_localizations:
+    dependency: "direct main"
+    description:
+      name: csv_localizations
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.2.0+1"
   cupertino_icons:
     dependency: "direct main"
     description:

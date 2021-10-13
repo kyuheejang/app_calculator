@@ -17,6 +17,7 @@ import 'package:app_calculator/src/widgets/math_box.dart';
 import 'package:app_calculator/src/widgets/result.dart';
 import 'package:app_calculator/src/widgets/keyboard.dart';
 import 'package:app_calculator/src/backend/math_model.dart';
+import 'package:csv_localizations/csv_localizations.dart';
 
 
 String testInitialAdId = "ca-app-pub-3940256099942544/1033173712";
@@ -207,6 +208,85 @@ class MyApp extends StatelessWidget {
         ),
       ],
       child: MaterialApp(
+        // localizationsDelegates: const [
+        //   CsvLocalizationsDelegate('assets/localization_calculator.csv'),
+        // ],
+        // supportedLocales: const [
+        //   Locale('en', 'GB'),
+        //   Locale('en', 'US'),
+        //   Locale('en'),
+        //   Locale('gl'),
+        //   Locale('gu'),
+        //   Locale('el'),
+        //   Locale('nl'),
+        //   Locale('ne'),
+        //   Locale('no'),
+        //   Locale('da'),
+        //   Locale('de'),
+        //   Locale('lo'),
+        //   Locale('lv'),
+        //   Locale('ru'),
+        //   Locale('ro'),
+        //   Locale('lt'),
+        //   Locale('mr'),
+        //   Locale('mk'),
+        //   Locale('ml'),
+        //   Locale('ms'),
+        //   Locale('mn'),
+        //   Locale('eu'),
+        //   Locale('my'),
+        //   Locale('vi'),
+        //   Locale('be'),
+        //   Locale('bn'),
+        //   Locale('bg'),
+        //   Locale('sr'),
+        //   Locale('sw'),
+        //   Locale('sv'),
+        //   Locale('es'),
+        //   Locale('sk'),
+        //   Locale('sl'),
+        //   Locale('si'),
+        //   Locale('ar'),
+        //   Locale('hy'),
+        //   Locale('is'),
+        //   Locale('az'),
+        //   Locale('af'),
+        //   Locale('sq'),
+        //   Locale('am'),
+        //   Locale('et'),
+        //   Locale('en'),
+        //   Locale('ur'),
+        //   Locale('uk'),
+        //   Locale('it'),
+        //   Locale('id'),
+        //   Locale('ja'),
+        //   Locale('ka'),
+        //   Locale('zu'),
+        //   Locale('zh', 'CN'),
+        //   Locale('zh', 'TW'),
+        //   Locale('cs'),
+        //   Locale('kk'),
+        //   Locale('ca'),
+        //   Locale('kn'),
+        //   Locale('hr'),
+        //   Locale('km'),
+        //   Locale('ky'),
+        //   Locale('ta'),
+        //   Locale('th'),
+        //   Locale('tr'),
+        //   Locale('te'),
+        //   Locale('pa'),
+        //   Locale('fa'),
+        //   Locale('pt'),
+        //   Locale('pl'),
+        //   Locale('fr'),
+        //   Locale('fi'),
+        //   Locale('fil'),
+        //   Locale('ko'),
+        //   Locale('hu'),
+        //   Locale('iw'),
+        //   Locale('hi'),
+        // ],
         debugShowCheckedModeBanner: false,
         title: 'handy calculator',
         theme: ThemeData(
@@ -296,7 +376,7 @@ class _HomePageState extends State<HomePage>
         context: context,
         builder: (context) {
           return AlertDialog(
-            title: const Text('formula name'),
+            title: Text(CsvLocalizations.instance.string('formula_name')),
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8.0)
             ),
@@ -313,7 +393,7 @@ class _HomePageState extends State<HomePage>
               FlatButton(
                 color: Colors.green,
                 textColor: Colors.white,
-                child: Text('OK'),
+                child: Text(CsvLocalizations.instance.string('ok')),
                 onPressed: () {
                   setState(() {
                     // mathModelList를 불러와서 리스트에 삽입한다.
@@ -325,16 +405,16 @@ class _HomePageState extends State<HomePage>
                     List<String> mathBoxList = prefs.getStringList('mathBoxList') ?? [];
                     if (saveName == "") {
                       return _showDialog(
-                          'Error',
-                          'Please specify a formula name'
+                          CsvLocalizations.instance.string('error'),
+                          CsvLocalizations.instance.string('please_specify')
                       );
                     }
 
                     if (mathModelNameList.length > 10) {
                       Navigator.pop(context);
                       return _showDialog(
-                          'Error',
-                          'Cannot store more than 10 formulas'
+                          CsvLocalizations.instance.string('error'),
+                          CsvLocalizations.instance.string('cannot_store'),
                       );
                     }
 
@@ -350,8 +430,8 @@ class _HomePageState extends State<HomePage>
                     _textFieldController.clear();
                     Navigator.pop(context);
                     return _showDialog(
-                        'Success',
-                        'Formula saved successfully'
+                        CsvLocalizations.instance.string('success'),
+                        CsvLocalizations.instance.string('formula_saved'),
                     );
                   });
                 },
@@ -359,7 +439,7 @@ class _HomePageState extends State<HomePage>
               FlatButton(
                 color: Colors.red,
                 textColor: Colors.white,
-                child: Text('CANCEL'),
+                child: Text(CsvLocalizations.instance.string('cancel')),
                 onPressed: () {
                   setState(() {
                     Navigator.pop(context);
@@ -381,7 +461,7 @@ class _HomePageState extends State<HomePage>
           content: new Text(body),
           actions: <Widget>[
             new FlatButton(
-              child: new Text("Close"),
+              child:Text(CsvLocalizations.instance.string('close')),
               onPressed: () {
                 Navigator.pop(context);
               },
@@ -420,13 +500,13 @@ class _HomePageState extends State<HomePage>
                         context: context,
                         builder: (BuildContext context) {
                           return AlertDialog(
-                            title: new Text("Alert"),
-                            content: new Text("load this formula?"),
+                            title: Text(CsvLocalizations.instance.string('alert')),
+                            content: Text(CsvLocalizations.instance.string('load_this')),
                             actions: <Widget>[
                               FlatButton(
                                 color: Colors.green,
                                 textColor: Colors.white,
-                                child: Text('OK'),
+                                child: Text(CsvLocalizations.instance.string('ok')),
                                 onPressed: () {
                                   setState(() {
                                     final mathModel = Provider.of<MathModel>(context, listen: false);
@@ -439,8 +519,8 @@ class _HomePageState extends State<HomePage>
                                     int count = 2;
                                     Navigator.of(context).popUntil((_) => count-- <= 0);
                                     return _showDialog(
-                                        'Success',
-                                        'Formula loaded successfully'
+                                        CsvLocalizations.instance.string('success'),
+                                        CsvLocalizations.instance.string('formula_loaded')
                                     );
                                   });
                                 },
@@ -448,7 +528,7 @@ class _HomePageState extends State<HomePage>
                               FlatButton(
                                 color: Colors.red,
                                 textColor: Colors.white,
-                                child: Text('CANCEL'),
+                                child: Text(CsvLocalizations.instance.string('cancel')),
                                 onPressed: () {
                                   setState(() {
                                     Navigator.pop(context);
@@ -471,13 +551,13 @@ class _HomePageState extends State<HomePage>
                         builder: (BuildContext context) {
                           // return object of type Dialog
                           return AlertDialog(
-                            title: const Text("Alert"),
-                            content: const Text("Remove this formula?"),
+                            title: Text(CsvLocalizations.instance.string('alert')),
+                            content: Text(CsvLocalizations.instance.string('remove_this')),
                             actions: <Widget>[
                               FlatButton(
                                 color: Colors.green,
                                 textColor: Colors.white,
-                                child: const Text('OK'),
+                                child: Text(CsvLocalizations.instance.string('ok')),
                                 onPressed: () {
                                   setState(() {
                                     // remove mathmode
@@ -492,8 +572,8 @@ class _HomePageState extends State<HomePage>
                                     int count = 2;
                                     Navigator.of(context).popUntil((_) => count-- <= 0);
                                     return _showDialog(
-                                        'Success',
-                                        'Formula removed successfully'
+                                        CsvLocalizations.instance.string('success'),
+                                        CsvLocalizations.instance.string('formula_removed')
                                     );
                                   });
                                 },
@@ -501,7 +581,7 @@ class _HomePageState extends State<HomePage>
                               FlatButton(
                                 color: Colors.red,
                                 textColor: Colors.white,
-                                child: const Text('CANCEL'),
+                                child: Text(CsvLocalizations.instance.string('cancel')),
                                 onPressed: () {
                                   setState(() {
                                     Navigator.pop(context);
@@ -570,10 +650,10 @@ class _HomePageState extends State<HomePage>
       physics: const NeverScrollableScrollPhysics(),
       padding: const EdgeInsets.symmetric(horizontal: 10.0),
       children: <Widget>[
-        const ListTile(
+        ListTile(
           leading: Text(
-            'Calc Setting',
-            style: TextStyle(
+            CsvLocalizations.instance.string('calc_setting'),
+            style: const TextStyle(
               fontWeight: FontWeight.w700,
             ),
           ),
@@ -599,8 +679,8 @@ class _HomePageState extends State<HomePage>
         SizedBox(height: 100),
         Consumer<SettingModel>(
           builder: (context, setmodel, _) => ListTile(
-            title: const Text(
-              'Calc Precision',
+            title: Text(
+              CsvLocalizations.instance.string('calc_precision'),
               style: TextStyle(
                 fontWeight: FontWeight.w700,
               ),),
@@ -618,9 +698,9 @@ class _HomePageState extends State<HomePage>
           ),
         ),
         const SizedBox(height: 100),
-        const ListTile(
+        ListTile(
           leading: Text(
-            'Change color: function keyboard',
+            CsvLocalizations.instance.string('function_keyboard'),
             style: TextStyle(
               fontWeight: FontWeight.w700,
             ),
@@ -629,12 +709,12 @@ class _HomePageState extends State<HomePage>
         Consumer<SettingModel>(
           builder: (context, setmodel, _) => ListTile(
             title: ToggleButtons(
-              children: const <Widget>[
-                Text('Brown'),
-                Text('Black'),
-                Text('Red'),
-                Text('Blue'),
-                Text('Orange'),
+              children: <Widget>[
+                Text(CsvLocalizations.instance.string('brown')),
+                Text(CsvLocalizations.instance.string('black')),
+                Text(CsvLocalizations.instance.string('red')),
+                Text(CsvLocalizations.instance.string('blue')),
+                Text(CsvLocalizations.instance.string('orange')),
               ],
               constraints: const BoxConstraints(
                 minWidth: 55,
@@ -653,9 +733,9 @@ class _HomePageState extends State<HomePage>
             ),
           ),
         ),const SizedBox(height: 100),
-        const ListTile(
+        ListTile(
           leading: Text(
-            'Change color: number keyboard',
+            CsvLocalizations.instance.string('number_keyboard'),
             style: TextStyle(
               fontWeight: FontWeight.w700,
             ),
@@ -664,12 +744,12 @@ class _HomePageState extends State<HomePage>
         Consumer<SettingModel>(
           builder: (context, setmodel, _) => ListTile(
             title: ToggleButtons(
-              children: const <Widget>[
-                Text('Brown'),
-                Text('Black'),
-                Text('Red'),
-                Text('Blue'),
-                Text('Orange'),
+              children: <Widget>[
+                Text(CsvLocalizations.instance.string('brown')),
+                Text(CsvLocalizations.instance.string('black')),
+                Text(CsvLocalizations.instance.string('red')),
+                Text(CsvLocalizations.instance.string('blue')),
+                Text(CsvLocalizations.instance.string('orange')),
               ],
               constraints: const BoxConstraints(
                 minWidth: 55,
@@ -701,10 +781,10 @@ class _HomePageState extends State<HomePage>
       physics: const NeverScrollableScrollPhysics(),
       padding: const EdgeInsets.symmetric(horizontal: 10.0),
       children: <Widget>[
-        const ListTile(
+        ListTile(
           leading: Text(
-            'Calc Setting',
-            style: TextStyle(
+            CsvLocalizations.instance.string('calc_setting'),
+            style: const TextStyle(
               fontWeight: FontWeight.w700,
             ),
           ),
@@ -730,8 +810,8 @@ class _HomePageState extends State<HomePage>
         SizedBox(height: 100),
         Consumer<SettingModel>(
           builder: (context, setmodel, _) => ListTile(
-            title: const Text(
-              'Calc Precision',
+            title: Text(
+              CsvLocalizations.instance.string('calc_precision'),
               style: TextStyle(
                 fontWeight: FontWeight.w700,
               ),),
@@ -749,9 +829,9 @@ class _HomePageState extends State<HomePage>
           ),
         ),
         const SizedBox(height: 100),
-        const ListTile(
+        ListTile(
           leading: Text(
-            'Change color: function keyboard',
+            CsvLocalizations.instance.string('function_keyboard'),
             style: TextStyle(
               fontWeight: FontWeight.w700,
             ),
@@ -760,12 +840,12 @@ class _HomePageState extends State<HomePage>
         Consumer<SettingModel>(
           builder: (context, setmodel, _) => ListTile(
             title: ToggleButtons(
-              children: const <Widget>[
-                Text('Brown'),
-                Text('Black'),
-                Text('Red'),
-                Text('Blue'),
-                Text('Orange'),
+              children: <Widget>[
+                Text(CsvLocalizations.instance.string('brown')),
+                Text(CsvLocalizations.instance.string('black')),
+                Text(CsvLocalizations.instance.string('red')),
+                Text(CsvLocalizations.instance.string('blue')),
+                Text(CsvLocalizations.instance.string('orange')),
               ],
               constraints: const BoxConstraints(
                 minWidth: 55,
@@ -784,9 +864,9 @@ class _HomePageState extends State<HomePage>
             ),
           ),
         ),const SizedBox(height: 100),
-        const ListTile(
+        ListTile(
           leading: Text(
-            'Change color: number keyboard',
+            CsvLocalizations.instance.string('number_keyboard'),
             style: TextStyle(
               fontWeight: FontWeight.w700,
             ),
@@ -795,12 +875,12 @@ class _HomePageState extends State<HomePage>
         Consumer<SettingModel>(
           builder: (context, setmodel, _) => ListTile(
             title: ToggleButtons(
-              children: const <Widget>[
-                Text('Brown'),
-                Text('Black'),
-                Text('Red'),
-                Text('Blue'),
-                Text('Orange'),
+              children: <Widget>[
+                Text(CsvLocalizations.instance.string('brown')),
+                Text(CsvLocalizations.instance.string('black')),
+                Text(CsvLocalizations.instance.string('red')),
+                Text(CsvLocalizations.instance.string('blue')),
+                Text(CsvLocalizations.instance.string('orange')),
               ],
               constraints: const BoxConstraints(
                 minWidth: 55,

@@ -29,6 +29,7 @@ dependencies:
   cloud_firestore: ^2.5.3
   app_tracking_transparency: ^2.0.1
   firebase_messaging: ^10.0.8
+  csv_localizations: ^1.2.0
 
 dev_dependencies:
   flutter_test:
@@ -54,6 +55,7 @@ flutter:
     - assets/html/jquery-3.4.1.min.js
     - assets/html/mathquill.css
     - assets/html/mathquill.min.js
+    - assets/localization_calculator.csv
 
   fonts:
     - family: TimesNewRoman
