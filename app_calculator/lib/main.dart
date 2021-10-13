@@ -89,7 +89,7 @@ void main() async {
   }
 
   await MobileAds.instance.initialize();
-  myBanner.load();
+  await myBanner.load();
 
   await InterstitialAd.load(adUnitId: settingInterAdId,
       request: const AdRequest(),
