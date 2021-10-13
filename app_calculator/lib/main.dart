@@ -18,6 +18,7 @@ import 'package:app_calculator/src/widgets/result.dart';
 import 'package:app_calculator/src/widgets/keyboard.dart';
 import 'package:app_calculator/src/backend/math_model.dart';
 import 'package:csv_localizations/csv_localizations.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 
 String testInitialAdId = "ca-app-pub-3940256099942544/1033173712";
@@ -208,85 +209,29 @@ class MyApp extends StatelessWidget {
         ),
       ],
       child: MaterialApp(
-        // localizationsDelegates: const [
-        //   CsvLocalizationsDelegate('assets/localization_calculator.csv'),
-        // ],
-        // supportedLocales: const [
-        //   Locale('en', 'GB'),
-        //   Locale('en', 'US'),
-        //   Locale('en'),
-        //   Locale('gl'),
-        //   Locale('gu'),
-        //   Locale('el'),
-        //   Locale('nl'),
-        //   Locale('ne'),
-        //   Locale('no'),
-        //   Locale('da'),
-        //   Locale('de'),
-        //   Locale('lo'),
-        //   Locale('lv'),
-        //   Locale('ru'),
-        //   Locale('ro'),
-        //   Locale('lt'),
-        //   Locale('mr'),
-        //   Locale('mk'),
-        //   Locale('ml'),
-        //   Locale('ms'),
-        //   Locale('mn'),
-        //   Locale('eu'),
-        //   Locale('my'),
-        //   Locale('vi'),
-        //   Locale('be'),
-        //   Locale('bn'),
-        //   Locale('bg'),
-        //   Locale('sr'),
-        //   Locale('sw'),
-        //   Locale('sv'),
-        //   Locale('es'),
-        //   Locale('sk'),
-        //   Locale('sl'),
-        //   Locale('si'),
-        //   Locale('ar'),
-        //   Locale('hy'),
-        //   Locale('is'),
-        //   Locale('az'),
-        //   Locale('af'),
-        //   Locale('sq'),
-        //   Locale('am'),
-        //   Locale('et'),
-        //   Locale('en'),
-        //   Locale('ur'),
-        //   Locale('uk'),
-        //   Locale('it'),
-        //   Locale('id'),
-        //   Locale('ja'),
-        //   Locale('ka'),
-        //   Locale('zu'),
-        //   Locale('zh', 'CN'),
-        //   Locale('zh', 'TW'),
-        //   Locale('cs'),
-        //   Locale('kk'),
-        //   Locale('ca'),
-        //   Locale('kn'),
-        //   Locale('hr'),
-        //   Locale('km'),
-        //   Locale('ky'),
-        //   Locale('ta'),
-        //   Locale('th'),
-        //   Locale('tr'),
-        //   Locale('te'),
-        //   Locale('pa'),
-        //   Locale('fa'),
-        //   Locale('pt'),
-        //   Locale('pl'),
-        //   Locale('fr'),
-        //   Locale('fi'),
-        //   Locale('fil'),
-        //   Locale('ko'),
-        //   Locale('hu'),
-        //   Locale('iw'),
-        //   Locale('hi'),
-        // ],
+        localizationsDelegates: const [
+          GlobalWidgetsLocalizations.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+          CsvLocalizationsDelegate('assets/localization_calculator.csv'),
+        ],
+        supportedLocales: const [
+          Locale('en'), Locale('gl'), Locale('gu'), Locale('el'), Locale('nl'),
+          Locale('ne'), Locale('no'), Locale('da'), Locale('de'), Locale('lo'),
+          Locale('lv'), Locale('ru'), Locale('ro'), Locale('lt'), Locale('mr'),
+          Locale('mk'), Locale('ml'), Locale('ms'), Locale('mn'), Locale('eu'),
+          Locale('my'), Locale('vi'), Locale('be'), Locale('bn'), Locale('bg'),
+          Locale('sr'), Locale('sw'), Locale('sv'), Locale('es'), Locale('sk'),
+          Locale('sl'), Locale('si'), Locale('ar'), Locale('hy'), Locale('is'),
+          Locale('az'), Locale('af'), Locale('sq'), Locale('am'), Locale('et'),
+          Locale('en'), Locale('ur'), Locale('uk'), Locale('it'), Locale('id'),
+          Locale('ja'), Locale('ka'), Locale('zu'), Locale('zh', 'CN'), Locale('zh', 'TW'),
+          Locale('cs'), Locale('kk'), Locale('ca'), Locale('kn'), Locale('hr'),
+          Locale('km'), Locale('ky'), Locale('ta'), Locale('th'), Locale('tr'),
+          Locale('te'), Locale('pa'), Locale('fa'), Locale('pt'), Locale('pl'),
+          Locale('fr'), Locale('fi'), Locale('fil'), Locale('ko'), Locale('hu'),
+          Locale('iw'), Locale('hi'),
+        ],
         debugShowCheckedModeBanner: false,
         title: 'handy calculator',
         theme: ThemeData(
@@ -938,7 +883,7 @@ class _HomePageState extends State<HomePage>
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text('formula list'),
+            title: Text(CsvLocalizations.instance.string('formula_list')),
             content: setupAlertDialoadContainer(),
           );
         });
@@ -981,22 +926,22 @@ class _HomePageState extends State<HomePage>
       bottomNavigationBar: BottomNavigationBar(onTap: _onItemTapped,
           currentIndex: _selectedIndex,
           type: BottomNavigationBarType.fixed,
-          items: const <BottomNavigationBarItem>[
+          items: <BottomNavigationBarItem>[
             BottomNavigationBarItem(
                 icon: Icon(FlutterIcons.md_calculator_ion),
-                title: Text('calculator')
+                title: Text(CsvLocalizations.instance.string('calculator'))
             ),
             BottomNavigationBarItem(
                 icon: Icon(FlutterIcons.setting_ant),
-                title: Text('setting')
+                title: Text(CsvLocalizations.instance.string('setting'))
             ),
             BottomNavigationBarItem(
                 icon: Icon(FontAwesomeIcons.save,),
-                title: Text('save')
+                title: Text(CsvLocalizations.instance.string('save'))
             ),
             BottomNavigationBarItem(
                 icon: Icon(FontAwesomeIcons.download),
-                title: Text('load')
+                title: Text(CsvLocalizations.instance.string('load'))
             ),
           ]),
     );
