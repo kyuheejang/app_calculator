@@ -27,7 +27,6 @@ class AppOpenAdManager {
           print('$ad loaded');
           _appOpenLoadTime = DateTime.now();
           _appOpenAd = ad;
-          _appOpenAd?.show();
         },
         onAdFailedToLoad: (error) {
           print('AppOpenAd failed to load: $error');
