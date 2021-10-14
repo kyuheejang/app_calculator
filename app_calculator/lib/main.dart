@@ -19,15 +19,19 @@ import 'package:app_calculator/src/widgets/keyboard.dart';
 import 'package:app_calculator/src/backend/math_model.dart';
 import 'package:csv_localizations/csv_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:app_calculator/app_open_ad_manager.dart';
+import 'package:app_calculator/app_lifecycle_refactor.dart';
 
 
 String testInitialAdId = "ca-app-pub-3940256099942544/1033173712";
 String testBannerAdId = "ca-app-pub-3940256099942544/6300978111";
+String testOpeningAdId = "ca-app-pub-3940256099942544/3419835294";
 
 String settingInterAdId = "";
 String formulaSaveInterAdId = "";
 String formulaLoadInterAdId = "";
 String settingBannerAdId = "";
+String openingAdId = "";
 int functionColorIndex = 0;
 int numberColorIndex = 0;
 Color functionBackgroundColor = Colors.black87;
@@ -77,20 +81,29 @@ void main() async {
       settingBannerAdId = value.data()?['iosSettingBanner'];
       formulaSaveInterAdId = value.data()?['iosFormulaSaveInter'];
       formulaLoadInterAdId = value.data()?['iosFormulaLoadInter'];
+      openingAdId = value.data()?['iosOpening'];
     } else {
       settingInterAdId = value.data()?['andSettingInter'];
       settingBannerAdId = value.data()?['andSettingBanner'];
       formulaSaveInterAdId = value.data()?['andFormulaSaveInter'];
       formulaLoadInterAdId = value.data()?['andFormulaLoadInter'];
+      openingAdId = value.data()?['andOpening'];
     }
   } else {
     settingInterAdId = testInitialAdId;
     formulaSaveInterAdId = testInitialAdId;
     formulaLoadInterAdId = testInitialAdId;
     settingBannerAdId = testBannerAdId;
+    openingAdId = testOpeningAdId;
   }
 
   await MobileAds.instance.initialize();
+  await MobileAds.instance.setAppMuted(true);
+
+  AppOpenAdManager appOpenAdManager = AppOpenAdManager(adUnitId: openingAdId)..loadAd();
+  WidgetsBinding.instance!
+      .addObserver(AppLifecycleReactor(appOpenAdManager: appOpenAdManager));
+
   await myBanner.load();
 
   await InterstitialAd.load(adUnitId: settingInterAdId,
