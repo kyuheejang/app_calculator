@@ -12,6 +12,74 @@
 	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
+	<key>CFBundleLocalizations</key>
+	<array>
+		<string>en</string>
+		<string>gl</string>
+		<string>gu</string>
+		<string>el</string>
+		<string>nl</string>
+		<string>ne</string>
+		<string>no</string>
+		<string>da</string>
+		<string>de</string>
+		<string>lo</string>
+		<string>lv</string>
+		<string>ru</string>
+		<string>ro</string>
+		<string>lt</string>
+		<string>mr</string>
+		<string>my</string>
+		<string>vi</string>
+		<string>be</string>
+		<string>bn</string>
+		<string>bg</string>
+		<string>sr</string>
+		<string>sw</string>
+		<string>sv</string>
+		<string>es</string>
+		<string>sk</string>
+		<string>sl</string>
+		<string>si</string>
+		<string>ar</string>
+		<string>hy</string>
+		<string>is</string>
+		<string>az</string>
+		<string>af</string>
+		<string>sq</string>
+		<string>am</string>
+		<string>et</string>
+		<string>en</string>
+		<string>ur</string>
+		<string>uk</string>
+		<string>it</string>
+		<string>id</string>
+		<string>ja</string>
+		<string>ka</string>
+		<string>zu</string>
+		<string>zh-CN</string>
+		<string>zh-TW</string>
+		<string>cs</string>
+		<string>kk</string>
+		<string>ca</string>
+		<string>kn</string>
+		<string>hr</string>
+		<string>km</string>
+		<string>ky</string>
+		<string>ta</string>
+		<string>th</string>
+		<string>tr</string>
+		<string>te</string>
+		<string>pa</string>
+		<string>fa</string>
+		<string>pt</string>
+		<string>pl</string>
+		<string>fr</string>
+		<string>fi</string>
+		<string>fil</string>
+		<string>ko</string>
+		<string>hu</string>
+	</array>
 	<key>CFBundleName</key>
 	<string>app_calclulator</string>
 	<key>CFBundlePackageType</key>
