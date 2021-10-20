@@ -27,6 +27,8 @@ String testInitialAdId = "ca-app-pub-3940256099942544/1033173712";
 String testBannerAdId = "ca-app-pub-3940256099942544/6300978111";
 String testOpeningAdId = "ca-app-pub-3940256099942544/3419835294";
 
+String endBannerAdId = "";
+
 String settingInterAdId = "";
 String formulaSaveInterAdId = "";
 String formulaLoadInterAdId = "";
