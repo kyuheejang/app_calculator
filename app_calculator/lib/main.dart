@@ -65,6 +65,13 @@ final BannerAd myBanner = BannerAd(
   listener: const BannerAdListener(),
 );
 
+final BannerAd endBanner = BannerAd(
+  adUnitId: endBannerAdId,
+  size: AdSize.mediumRectangle,
+  request: const AdRequest(),
+  listener: const BannerAdListener(),
+);
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final status = await AppTrackingTransparency.requestTrackingAuthorization();
@@ -84,12 +91,14 @@ void main() async {
       formulaSaveInterAdId = value.data()?['iosFormulaSaveInter'];
       formulaLoadInterAdId = value.data()?['iosFormulaLoadInter'];
       openingAdId = value.data()?['iosOpening'];
+      endBannerAdId = value.data()?['iosEndBanner'];
     } else {
       settingInterAdId = value.data()?['andSettingInter'];
       settingBannerAdId = value.data()?['andSettingBanner'];
       formulaSaveInterAdId = value.data()?['andFormulaSaveInter'];
       formulaLoadInterAdId = value.data()?['andFormulaLoadInter'];
       openingAdId = value.data()?['andOpening'];
+      endBannerAdId = value.data()?['andEndBanner'];
     }
   } else {
     settingInterAdId = testInitialAdId;
@@ -97,6 +106,7 @@ void main() async {
     formulaLoadInterAdId = testInitialAdId;
     settingBannerAdId = testBannerAdId;
     openingAdId = testOpeningAdId;
+    endBannerAdId = testBannerAdId;
   }
 
   await MobileAds.instance.initialize();
@@ -107,6 +117,8 @@ void main() async {
       .addObserver(AppLifecycleReactor(appOpenAdManager: appOpenAdManager));
 
   await myBanner.load();
+
+  await endBanner.load();
 
   await InterstitialAd.load(adUnitId: settingInterAdId,
       request: const AdRequest(),
@@ -906,59 +918,104 @@ class _HomePageState extends State<HomePage>
 
   @override
   Widget build(BuildContext context) {
-
-    return Scaffold(
-      resizeToAvoidBottomInset : false,
-      appBar: PreferredSize(
-        preferredSize: Size.fromHeight(15.0),
-        child: AppBar(
-          elevation: 0.0,
-          backgroundColor: Colors.transparent,
+    return WillPopScope(
+      child: Scaffold(
+        resizeToAvoidBottomInset : false,
+        appBar: PreferredSize(
+          preferredSize: Size.fromHeight(15.0),
+          child: AppBar(
+            elevation: 0.0,
+            backgroundColor: Colors.transparent,
+          ),
         ),
+        body: PageView(
+          physics:const NeverScrollableScrollPhysics(),
+          controller: pageController,
+          children: [
+              Column(
+              children: <Widget>[
+              Expanded(
+                flex: 10,
+                child: Stack(
+                  alignment: Alignment.bottomCenter,
+                  children: const <Widget>[
+                    MathBox(),
+                    SlidComponent(),
+                  ],
+                ),
+              ),
+              MathKeyBoard()
+              ],
+            ),
+            settingPage2(),
+          ],
+        ),
+        bottomNavigationBar: BottomNavigationBar(onTap: _onItemTapped,
+            currentIndex: _selectedIndex,
+            type: BottomNavigationBarType.fixed,
+            items: <BottomNavigationBarItem>[
+              BottomNavigationBarItem(
+                  icon: Icon(FlutterIcons.md_calculator_ion),
+                  title: Text(CsvLocalizations.instance.string('calculator'))
+              ),
+              BottomNavigationBarItem(
+                  icon: Icon(FlutterIcons.setting_ant),
+                  title: Text(CsvLocalizations.instance.string('setting'))
+              ),
+              BottomNavigationBarItem(
+                  icon: Icon(FontAwesomeIcons.save,),
+                  title: Text(CsvLocalizations.instance.string('save'))
+              ),
+              BottomNavigationBarItem(
+                  icon: Icon(FontAwesomeIcons.download),
+                  title: Text(CsvLocalizations.instance.string('load'))
+              ),
+            ]),
       ),
-      body: PageView(
-        physics:const NeverScrollableScrollPhysics(),
-        controller: pageController,
-        children: [
-            Column(
-            children: <Widget>[
-            Expanded(
-              flex: 10,
-              child: Stack(
-                alignment: Alignment.bottomCenter,
-                children: const <Widget>[
-                  MathBox(),
-                  SlidComponent(),
+      onWillPop: () {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text(CsvLocalizations.instance.string('end')),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(CsvLocalizations.instance.string('end_app')),
+                  Container(
+                    width: 330,
+                    height: 260,
+                    child: AdWidget(ad: endBanner),
+                  )
                 ],
               ),
-            ),
-            MathKeyBoard()
-            ],
-          ),
-          settingPage2(),
-        ],
-      ),
-      bottomNavigationBar: BottomNavigationBar(onTap: _onItemTapped,
-          currentIndex: _selectedIndex,
-          type: BottomNavigationBarType.fixed,
-          items: <BottomNavigationBarItem>[
-            BottomNavigationBarItem(
-                icon: Icon(FlutterIcons.md_calculator_ion),
-                title: Text(CsvLocalizations.instance.string('calculator'))
-            ),
-            BottomNavigationBarItem(
-                icon: Icon(FlutterIcons.setting_ant),
-                title: Text(CsvLocalizations.instance.string('setting'))
-            ),
-            BottomNavigationBarItem(
-                icon: Icon(FontAwesomeIcons.save,),
-                title: Text(CsvLocalizations.instance.string('save'))
-            ),
-            BottomNavigationBarItem(
-                icon: Icon(FontAwesomeIcons.download),
-                title: Text(CsvLocalizations.instance.string('load'))
-            ),
-          ]),
+              actions: <Widget>[
+                FlatButton(
+                  color: Colors.green,
+                  textColor: Colors.white,
+                  child: Text(CsvLocalizations.instance.string('ok')),
+                  onPressed: () {
+                    setState(() {
+                      SystemNavigator.pop();
+                    });
+                  },
+                ),
+                FlatButton(
+                  color: Colors.red,
+                  textColor: Colors.white,
+                  child: Text(CsvLocalizations.instance.string('cancel'),),
+                  onPressed: () {
+                    setState(() {
+                      Navigator.pop(context);
+                    });
+                  },
+                ),
+              ],
+            );
+          },
+        );
+        return new Future(() => false);
+      },
     );
   }
 }
