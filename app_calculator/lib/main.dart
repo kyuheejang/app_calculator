@@ -19,21 +19,17 @@ import 'package:app_calculator/src/widgets/keyboard.dart';
 import 'package:app_calculator/src/backend/math_model.dart';
 import 'package:csv_localizations/csv_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:app_calculator/app_open_ad_manager.dart';
-import 'package:app_calculator/app_lifecycle_refactor.dart';
 
 
 String testInitialAdId = "ca-app-pub-3940256099942544/1033173712";
 String testBannerAdId = "ca-app-pub-3940256099942544/6300978111";
-String testOpeningAdId = "ca-app-pub-3940256099942544/3419835294";
 
-String endBannerAdId = "";
-
-String settingInterAdId = "";
 String formulaSaveInterAdId = "";
-String formulaLoadInterAdId = "";
 String settingBannerAdId = "";
-String openingAdId = "";
+String endBannerAdId = "";
+String historyBannerAdId = "";
+String mainBannerAdId = "";
+
 int functionColorIndex = 0;
 int numberColorIndex = 0;
 Color functionBackgroundColor = Colors.black87;
@@ -49,18 +45,19 @@ class PushNotification {
   String? body;
 }
 
-// 세팅 광고
-InterstitialAd? settingInterAd;
-
 // 수식 save 광고
 InterstitialAd? saveInterAd;
 
-// 수식 load 광고
-InterstitialAd? loadInterAd;
-
-final BannerAd myBanner = BannerAd(
-  adUnitId: settingBannerAdId,
+final BannerAd mainBanner = BannerAd(
+  adUnitId: mainBannerAdId,
   size: AdSize.banner,
+  request: const AdRequest(),
+  listener: const BannerAdListener(),
+);
+
+final BannerAd settingBanner = BannerAd(
+  adUnitId: settingBannerAdId,
+  size: AdSize.mediumRectangle,
   request: const AdRequest(),
   listener: const BannerAdListener(),
 );
@@ -71,6 +68,14 @@ final BannerAd endBanner = BannerAd(
   request: const AdRequest(),
   listener: const BannerAdListener(),
 );
+
+final BannerAd historyBanner = BannerAd(
+  adUnitId: settingBannerAdId,
+  size: AdSize.banner,
+  request: const AdRequest(),
+  listener: const BannerAdListener(),
+);
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -86,64 +91,34 @@ void main() async {
     var value = await adCollectionReference.get();
 
     if (defaultTargetPlatform == TargetPlatform.iOS) {
-      settingInterAdId = value.data()?['iosSettingInter'];
+      mainBannerAdId = value.data()?['iosMainBanner'];
       settingBannerAdId = value.data()?['iosSettingBanner'];
       formulaSaveInterAdId = value.data()?['iosFormulaSaveInter'];
-      formulaLoadInterAdId = value.data()?['iosFormulaLoadInter'];
-      openingAdId = value.data()?['iosOpening'];
       endBannerAdId = value.data()?['iosEndBanner'];
+      historyBannerAdId = value.data()?['iosHistoryBanner'];
     } else {
-      settingInterAdId = value.data()?['andSettingInter'];
+      mainBannerAdId = value.data()?['andMainBanner'];
       settingBannerAdId = value.data()?['andSettingBanner'];
       formulaSaveInterAdId = value.data()?['andFormulaSaveInter'];
-      formulaLoadInterAdId = value.data()?['andFormulaLoadInter'];
-      openingAdId = value.data()?['andOpening'];
       endBannerAdId = value.data()?['andEndBanner'];
+      historyBannerAdId = value.data()?['andHistoryBanner'];
     }
   } else {
-    settingInterAdId = testInitialAdId;
+    mainBannerAdId = testBannerAdId;
     formulaSaveInterAdId = testInitialAdId;
-    formulaLoadInterAdId = testInitialAdId;
     settingBannerAdId = testBannerAdId;
-    openingAdId = testOpeningAdId;
     endBannerAdId = testBannerAdId;
+    historyBannerAdId = testBannerAdId;
   }
 
   await MobileAds.instance.initialize();
   await MobileAds.instance.setAppMuted(true);
 
-  AppOpenAdManager appOpenAdManager = AppOpenAdManager(adUnitId: openingAdId)..loadAd();
-  WidgetsBinding.instance!
-      .addObserver(AppLifecycleReactor(appOpenAdManager: appOpenAdManager));
+  mainBanner.load();
+  settingBanner.load();
+  endBanner.load();
+  historyBanner.load();
 
-  await myBanner.load();
-
-  await endBanner.load();
-
-  await InterstitialAd.load(adUnitId: settingInterAdId,
-      request: const AdRequest(),
-      adLoadCallback: InterstitialAdLoadCallback(
-        onAdLoaded: (ad) {
-          settingInterAd=ad;
-        },
-        onAdFailedToLoad: (error) {
-          settingInterAd=null;
-        },
-      ));
-
-  settingInterAd?.fullScreenContentCallback = FullScreenContentCallback(
-    onAdShowedFullScreenContent: (InterstitialAd ad) =>
-        print('$ad onAdShowedFullScreenContent.'),
-    onAdDismissedFullScreenContent: (InterstitialAd ad) {
-      print('$ad onAdDismissedFullScreenContent.');
-      ad.dispose();
-    },
-    onAdFailedToShowFullScreenContent: (InterstitialAd ad, AdError error) {
-      print('$ad onAdFailedToShowFullScreenContent: $error');
-      ad.dispose();
-    },
-    onAdImpression: (InterstitialAd ad) => print('$ad impression occurred.'),
-  );
 
   await InterstitialAd.load(adUnitId: formulaSaveInterAdId,
       request: const AdRequest(),
@@ -157,31 +132,6 @@ void main() async {
       ));
 
   saveInterAd?.fullScreenContentCallback = FullScreenContentCallback(
-    onAdShowedFullScreenContent: (InterstitialAd ad) =>
-        print('$ad onAdShowedFullScreenContent.'),
-    onAdDismissedFullScreenContent: (InterstitialAd ad) {
-      print('$ad onAdDismissedFullScreenContent.');
-      ad.dispose();
-    },
-    onAdFailedToShowFullScreenContent: (InterstitialAd ad, AdError error) {
-      print('$ad onAdFailedToShowFullScreenContent: $error');
-      ad.dispose();
-    },
-    onAdImpression: (InterstitialAd ad) => print('$ad impression occurred.'),
-  );
-
-  await InterstitialAd.load(adUnitId: formulaLoadInterAdId,
-      request: const AdRequest(),
-      adLoadCallback: InterstitialAdLoadCallback(
-        onAdLoaded: (ad) {
-          loadInterAd=ad;
-        },
-        onAdFailedToLoad: (error) {
-          loadInterAd = null;
-        },
-      ));
-
-  loadInterAd?.fullScreenContentCallback = FullScreenContentCallback(
     onAdShowedFullScreenContent: (InterstitialAd ad) =>
         print('$ad onAdShowedFullScreenContent.'),
     onAdDismissedFullScreenContent: (InterstitialAd ad) {
@@ -344,7 +294,7 @@ class _HomePageState extends State<HomePage>
 
     String saveName = "";
 
-    return await showDialog(
+    showDialog(
         context: context,
         builder: (context) {
           return AlertDialog(
@@ -384,9 +334,9 @@ class _HomePageState extends State<HomePage>
 
                     if (mathModelNameList.length > 10) {
                       Navigator.pop(context);
-                      return _showDialog(
-                          CsvLocalizations.instance.string('error'),
-                          CsvLocalizations.instance.string('cannot_store'),
+                      _showDialog(
+                        CsvLocalizations.instance.string('error'),
+                        CsvLocalizations.instance.string('cannot_store'),
                       );
                     }
 
@@ -401,9 +351,9 @@ class _HomePageState extends State<HomePage>
                     prefs.setStringList("mathBoxList", mathBoxList);
                     _textFieldController.clear();
                     Navigator.pop(context);
-                    return _showDialog(
-                        CsvLocalizations.instance.string('success'),
-                        CsvLocalizations.instance.string('formula_saved'),
+                    _showDialog(
+                      CsvLocalizations.instance.string('success'),
+                      CsvLocalizations.instance.string('formula_saved'),
                     );
                   });
                 },
@@ -420,7 +370,7 @@ class _HomePageState extends State<HomePage>
               ),
             ],
           );
-        });
+      });
   }
 
   void _showDialog(String title, String body) {
@@ -441,6 +391,138 @@ class _HomePageState extends State<HomePage>
           ],
         );
       },
+    );
+  }
+
+  Widget formulaHistoryList() {
+    List<String> expressionList = prefs.getStringList('expressionList') ?? [];
+    List<String> resultList = prefs.getStringList('resultList') ?? [];
+    List<String> mathModelNameList = prefs.getStringList('mathModelNameList') ?? [];
+    List<String> mathBoxList = prefs.getStringList('mathBoxList') ?? [];
+
+    return Flexible(
+      child: ListView.builder(
+        shrinkWrap: true,
+        itemCount: mathModelNameList.length,
+        itemBuilder: (BuildContext context, int index) {
+          return Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child:  ListTile(
+            title: Text(mathModelNameList[index]),
+            trailing: SizedBox(
+              width: 100,
+              child: Row(
+                children: [
+                  IconButton(
+                    icon: const Icon(
+                      FontAwesomeIcons.download,
+                      color: Colors.blue,),
+                    onPressed: () {
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: Text(CsvLocalizations.instance.string('alert')),
+                            content: Text(CsvLocalizations.instance.string('load_this')),
+                            actions: <Widget>[
+                              FlatButton(
+                                color: Colors.green,
+                                textColor: Colors.white,
+                                child: Text(CsvLocalizations.instance.string('ok')),
+                                onPressed: () {
+                                  setState(() {
+                                    final mathModel = Provider.of<MathModel>(context, listen: false);
+                                    mathModel.updateExpression(expressionList[index]);
+                                    mathModel.setResult(resultList[index]);
+                                    mathModel.calcNumber();
+                                    final mathBoxController = Provider.of<MathBoxController>(context, listen:false);
+                                    mathBoxController.decodeMathBoxHistory(mathBoxList[index]);
+                                    mathBoxController.loadSavedHistory();
+                                    Navigator.pop(context);
+                                    return _showDialog(
+                                        CsvLocalizations.instance.string('success'),
+                                        CsvLocalizations.instance.string('formula_loaded')
+                                    );
+                                  });
+                                },
+                              ),
+                              FlatButton(
+                                color: Colors.red,
+                                textColor: Colors.white,
+                                child: Text(CsvLocalizations.instance.string('cancel')),
+                                onPressed: () {
+                                  setState(() {
+                                    Navigator.pop(context);
+                                  });
+                                },
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    },
+                  ),
+                  IconButton(
+                    icon: const Icon(
+                      FontAwesomeIcons.trashAlt,
+                      color: Colors.red,),
+                    onPressed: () {
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          // return object of type Dialog
+                          return AlertDialog(
+                            title: Text(CsvLocalizations.instance.string('alert')),
+                            content: Text(CsvLocalizations.instance.string('remove_this')),
+                            actions: <Widget>[
+                              FlatButton(
+                                color: Colors.green,
+                                textColor: Colors.white,
+                                child: Text(CsvLocalizations.instance.string('ok')),
+                                onPressed: () {
+                                  setState(() {
+                                    // remove mathmode
+                                    mathModelNameList.removeAt(index);
+                                    expressionList.removeAt(index);
+                                    resultList.removeAt(index);
+                                    mathBoxList.removeAt(index);
+                                    prefs.setStringList("mathModelNameList", mathModelNameList);
+                                    prefs.setStringList("expressionList", expressionList);
+                                    prefs.setStringList("resultList", resultList);
+                                    prefs.setStringList("mathBoxList", mathBoxList);
+                                    Navigator.pop(context);
+                                    return _showDialog(
+                                        CsvLocalizations.instance.string('success'),
+                                        CsvLocalizations.instance.string('formula_removed')
+                                    );
+                                  });
+                                },
+                              ),
+                              FlatButton(
+                                color: Colors.red,
+                                textColor: Colors.white,
+                                child: Text(CsvLocalizations.instance.string('cancel')),
+                                onPressed: () {
+                                  setState(() {
+                                    Navigator.pop(context);
+                                  });
+                                },
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ),
+            ),
+          );
+        },
+      ),
     );
   }
 
@@ -488,8 +570,7 @@ class _HomePageState extends State<HomePage>
                                     final mathBoxController = Provider.of<MathBoxController>(context, listen:false);
                                     mathBoxController.decodeMathBoxHistory(mathBoxList[index]);
                                     mathBoxController.loadSavedHistory();
-                                    int count = 2;
-                                    Navigator.of(context).popUntil((_) => count-- <= 0);
+                                    Navigator.pop(context);
                                     return _showDialog(
                                         CsvLocalizations.instance.string('success'),
                                         CsvLocalizations.instance.string('formula_loaded')
@@ -610,13 +691,7 @@ class _HomePageState extends State<HomePage>
     super.dispose();
   }
 
-  Future<ListView> settingPage(BuildContext context) async {
-
-    if (settingInterAd != null) {
-      await settingInterAd!.show();
-    }
-
-    final AdWidget bannerWidget = AdWidget(ad: myBanner);
+  Widget settingPage() {
     return ListView(
       itemExtent: 60.0,
       physics: const NeverScrollableScrollPhysics(),
@@ -648,7 +723,7 @@ class _HomePageState extends State<HomePage>
             ),
           ),
         ),
-        SizedBox(height: 100),
+        SizedBox(height: 50),
         Consumer<SettingModel>(
           builder: (context, setmodel, _) => ListTile(
             title: Text(
@@ -669,7 +744,7 @@ class _HomePageState extends State<HomePage>
             trailing: Text('${setmodel.precision.toInt()}'),
           ),
         ),
-        const SizedBox(height: 100),
+        const SizedBox(height: 50),
         ListTile(
           leading: Text(
             CsvLocalizations.instance.string('function_keyboard'),
@@ -704,7 +779,7 @@ class _HomePageState extends State<HomePage>
               },
             ),
           ),
-        ),const SizedBox(height: 100),
+        ),const SizedBox(height: 50),
         ListTile(
           leading: Text(
             CsvLocalizations.instance.string('number_keyboard'),
@@ -740,138 +815,14 @@ class _HomePageState extends State<HomePage>
             ),
           ),
         ),
-        bannerWidget
-      ],
-    );
-  }
-
-  Widget settingPage2() {
-
-    final AdWidget bannerWidget = AdWidget(ad: myBanner);
-    return ListView(
-      itemExtent: 60.0,
-      physics: const NeverScrollableScrollPhysics(),
-      padding: const EdgeInsets.symmetric(horizontal: 10.0),
-      children: <Widget>[
-        ListTile(
-          leading: Text(
-            CsvLocalizations.instance.string('calc_setting'),
-            style: const TextStyle(
-              fontWeight: FontWeight.w700,
-            ),
-          ),
+        SizedBox(
+          height: 20,
         ),
-        Consumer<SettingModel>(
-          builder: (context, setmodel, _) => ListTile(
-            title: ToggleButtons(
-              children: const <Widget>[
-                Text('RAD'),
-                Text('DEG'),
-              ],
-              constraints: const BoxConstraints(
-                minWidth: 100,
-                minHeight: 40,
-              ),
-              isSelected: [setmodel.isRadMode, !setmodel.isRadMode],
-              onPressed: (index) {
-                setmodel.changeRadMode((index==0)?true:false);
-              },
-            ),
-          ),
-        ),
-        SizedBox(height: 100),
-        Consumer<SettingModel>(
-          builder: (context, setmodel, _) => ListTile(
-            title: Text(
-              CsvLocalizations.instance.string('calc_precision'),
-              style: TextStyle(
-                fontWeight: FontWeight.w700,
-              ),),
-            subtitle: Slider(
-              value: setmodel.precision.toDouble(),
-              min: 0.0,
-              max: 10.0,
-              label: "${setmodel.precision.toInt()}",
-              divisions: 10,
-              onChanged: (val) {
-                setmodel.changeSlider(val);
-              },
-            ),
-            trailing: Text('${setmodel.precision.toInt()}'),
-          ),
-        ),
-        const SizedBox(height: 100),
-        ListTile(
-          leading: Text(
-            CsvLocalizations.instance.string('function_keyboard'),
-            style: TextStyle(
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-        ),
-        Consumer<SettingModel>(
-          builder: (context, setmodel, _) => ListTile(
-            title: ToggleButtons(
-              children: <Widget>[
-                Text(CsvLocalizations.instance.string('brown')),
-                Text(CsvLocalizations.instance.string('black')),
-                Text(CsvLocalizations.instance.string('red')),
-                Text(CsvLocalizations.instance.string('blue')),
-                Text(CsvLocalizations.instance.string('orange')),
-              ],
-              constraints: const BoxConstraints(
-                minWidth: 55,
-                minHeight: 40,
-              ),
-              isSelected: [
-                setmodel.functionColorList[0],
-                setmodel.functionColorList[1],
-                setmodel.functionColorList[2],
-                setmodel.functionColorList[3],
-                setmodel.functionColorList[4],
-              ],
-              onPressed: (index) {
-                setmodel.changeFunctionColor(index);
-              },
-            ),
-          ),
-        ),const SizedBox(height: 100),
-        ListTile(
-          leading: Text(
-            CsvLocalizations.instance.string('number_keyboard'),
-            style: TextStyle(
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-        ),
-        Consumer<SettingModel>(
-          builder: (context, setmodel, _) => ListTile(
-            title: ToggleButtons(
-              children: <Widget>[
-                Text(CsvLocalizations.instance.string('brown')),
-                Text(CsvLocalizations.instance.string('black')),
-                Text(CsvLocalizations.instance.string('red')),
-                Text(CsvLocalizations.instance.string('blue')),
-                Text(CsvLocalizations.instance.string('orange')),
-              ],
-              constraints: const BoxConstraints(
-                minWidth: 55,
-                minHeight: 40,
-              ),
-              isSelected: [
-                setmodel.numberColorList[0],
-                setmodel.numberColorList[1],
-                setmodel.numberColorList[2],
-                setmodel.numberColorList[3],
-                setmodel.numberColorList[4],
-              ],
-              onPressed: (index) {
-                setmodel.changeNumberColor(index);
-              },
-            ),
-          ),
-        ),
-        bannerWidget
+        Container(
+          height: 250,
+          width: 300,
+          child: AdWidget(ad: settingBanner)
+        )
       ],
     );
   }
@@ -880,40 +831,33 @@ class _HomePageState extends State<HomePage>
   int _selectedIndex=0;
 
   void _onItemTapped (int index) async {
-
     setState(() {
       if (index == 0) {
-        _selectedIndex = 0;
+        pageController.animateToPage(
+          0,
+          curve: Curves.easeIn,
+          duration: const Duration(milliseconds: 100),);
       } else if (index == 1) {
         _selectedIndex = 1;
-        settingPage(context);
+        pageController.animateToPage(
+          1,
+          curve: Curves.easeIn,
+          duration: const Duration(milliseconds: 100),);
       } else if (index == 2) {
-        index = 0;
-        _displayTextInputDialog(context);
+        _selectedIndex = 2;
+        pageController.animateToPage(
+          2,
+          curve: Curves.easeIn,
+          duration: const Duration(milliseconds: 100),);
       } else if (index == 3) {
-        index = 0;
-        _displaySavedListDialog(context);
+        _selectedIndex = 0;
+        pageController.jumpTo(0);
       }
-      _selectedIndex=index;
     });
-    pageController.animateToPage(
-      index,
-      curve: Curves.easeIn,
-      duration: const Duration(milliseconds: 100),);
-  }
 
-  Future<void> _displaySavedListDialog(BuildContext context) async {
-    if (loadInterAd != null) {
-      await loadInterAd!.show();
+    if (index == 3) {
+      _displayTextInputDialog(context);
     }
-    await showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text(CsvLocalizations.instance.string('formula_list')),
-            content: setupAlertDialoadContainer(),
-          );
-        });
   }
 
   @override
@@ -922,7 +866,7 @@ class _HomePageState extends State<HomePage>
       child: Scaffold(
         resizeToAvoidBottomInset : false,
         appBar: PreferredSize(
-          preferredSize: Size.fromHeight(15.0),
+          preferredSize: Size.fromHeight(4.0),
           child: AppBar(
             elevation: 0.0,
             backgroundColor: Colors.transparent,
@@ -934,20 +878,41 @@ class _HomePageState extends State<HomePage>
           children: [
               Column(
               children: <Widget>[
-              Expanded(
-                flex: 10,
-                child: Stack(
-                  alignment: Alignment.bottomCenter,
-                  children: const <Widget>[
-                    MathBox(),
-                    SlidComponent(),
-                  ],
+                Container(
+                  height: 50,
+                  child: AdWidget(ad: mainBanner),
                 ),
-              ),
-              MathKeyBoard()
+                Container(
+                  height: 10,
+                ),
+                Expanded(
+                  flex: 10,
+                  child: Stack(
+                    alignment: Alignment.bottomCenter,
+                    children: const <Widget>[
+                      MathBox(),
+                      SlidComponent(),
+                    ],
+                  ),
+                ),
+                MathKeyBoard(),
               ],
             ),
-            settingPage2(),
+            settingPage(),
+            Container(
+              color: Colors.white24,
+              child: Column(
+                children: [
+                  Container(
+                    width: double.infinity,
+                    height: 60,
+                    child: AdWidget(ad: historyBanner),
+                  ),
+                  SizedBox(height: 10),
+                  formulaHistoryList(),
+                ],
+              ),
+            ),
           ],
         ),
         bottomNavigationBar: BottomNavigationBar(onTap: _onItemTapped,
@@ -963,12 +928,12 @@ class _HomePageState extends State<HomePage>
                   title: Text(CsvLocalizations.instance.string('setting'))
               ),
               BottomNavigationBarItem(
-                  icon: Icon(FontAwesomeIcons.save,),
-                  title: Text(CsvLocalizations.instance.string('save'))
+                  icon: Icon(FlutterIcons.history_faw),
+                  title: Text(CsvLocalizations.instance.string('history'))
               ),
               BottomNavigationBarItem(
-                  icon: Icon(FontAwesomeIcons.download),
-                  title: Text(CsvLocalizations.instance.string('load'))
+                  icon: Icon(FontAwesomeIcons.save,),
+                  title: Text(CsvLocalizations.instance.string('save'))
               ),
             ]),
       ),
