@@ -60,7 +60,7 @@ InterstitialAd? loadInterAd;
 
 final BannerAd myBanner = BannerAd(
   adUnitId: settingBannerAdId,
-  size: AdSize.fullBanner,
+  size: AdSize.banner,
   request: const AdRequest(),
   listener: const BannerAdListener(),
 );
