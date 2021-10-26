@@ -19,8 +19,9 @@ import 'package:app_calculator/src/widgets/keyboard.dart';
 import 'package:app_calculator/src/backend/math_model.dart';
 import 'package:csv_localizations/csv_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:app_calculator/app_open_ad_manager.dart';
-import 'package:app_calculator/app_lifecycle_refactor.dart';
+import 'package:app_calculator/ad/app_open_ad_manager.dart';
+import 'package:app_calculator/ad/app_lifecycle_refactor.dart';
+import 'package:app_calculator/screens/more_apps.dart';
 
 
 String testInitialAdId = "ca-app-pub-3940256099942544/1033173712";
@@ -33,12 +34,16 @@ String settingInterAdId = "";
 String formulaSaveInterAdId = "";
 String formulaLoadInterAdId = "";
 String settingBannerAdId = "";
+String historyBannerAdId = "";
+String moreAppsInterAdId = "";
 String openingAdId = "";
+String moreAppsBannerAdId = "";
 int functionColorIndex = 0;
 int numberColorIndex = 0;
 Color functionBackgroundColor = Colors.black87;
 Color numberBackgroundColor = Colors.black87;
 late SharedPreferences prefs;
+late Icon more_apps_icon;
 
 class PushNotification {
   PushNotification({
@@ -58,7 +63,10 @@ InterstitialAd? saveInterAd;
 // 수식 load 광고
 InterstitialAd? loadInterAd;
 
-final BannerAd myBanner = BannerAd(
+// moreApps 광고
+InterstitialAd? moreAppsInterAd;
+
+final BannerAd settingBanner = BannerAd(
   adUnitId: settingBannerAdId,
   size: AdSize.banner,
   request: const AdRequest(),
@@ -67,6 +75,20 @@ final BannerAd myBanner = BannerAd(
 
 final BannerAd endBanner = BannerAd(
   adUnitId: endBannerAdId,
+  size: AdSize.mediumRectangle,
+  request: const AdRequest(),
+  listener: const BannerAdListener(),
+);
+
+final BannerAd historyBanner = BannerAd(
+  adUnitId: historyBannerAdId,
+  size: AdSize.mediumRectangle,
+  request: const AdRequest(),
+  listener: const BannerAdListener(),
+);
+
+final BannerAd moreAppsBanner = BannerAd(
+  adUnitId: moreAppsBannerAdId,
   size: AdSize.mediumRectangle,
   request: const AdRequest(),
   listener: const BannerAdListener(),
@@ -90,15 +112,21 @@ void main() async {
       settingBannerAdId = value.data()?['iosSettingBanner'];
       formulaSaveInterAdId = value.data()?['iosFormulaSaveInter'];
       formulaLoadInterAdId = value.data()?['iosFormulaLoadInter'];
+      moreAppsInterAdId = value.data()?['iosMoreAppsInter'];
+      moreAppsBannerAdId = value.data()?['iosMoreAppsBanner'];
       openingAdId = value.data()?['iosOpening'];
       endBannerAdId = value.data()?['iosEndBanner'];
+      historyBannerAdId = value.data()?['iosHistoryBanner'];
     } else {
       settingInterAdId = value.data()?['andSettingInter'];
       settingBannerAdId = value.data()?['andSettingBanner'];
       formulaSaveInterAdId = value.data()?['andFormulaSaveInter'];
       formulaLoadInterAdId = value.data()?['andFormulaLoadInter'];
+      moreAppsInterAdId = value.data()?['andMoreAppsInter'];
+      moreAppsBannerAdId = value.data()?['andMoreAppsBanner'];
       openingAdId = value.data()?['andOpening'];
       endBannerAdId = value.data()?['andEndBanner'];
+      historyBannerAdId = value.data()?['andHistoryBanner'];
     }
   } else {
     settingInterAdId = testInitialAdId;
@@ -107,6 +135,9 @@ void main() async {
     settingBannerAdId = testBannerAdId;
     openingAdId = testOpeningAdId;
     endBannerAdId = testBannerAdId;
+    historyBannerAdId = testBannerAdId;
+    moreAppsInterAdId = testInitialAdId;
+    moreAppsBannerAdId = testBannerAdId;
   }
 
   await MobileAds.instance.initialize();
@@ -116,9 +147,10 @@ void main() async {
   WidgetsBinding.instance!
       .addObserver(AppLifecycleReactor(appOpenAdManager: appOpenAdManager));
 
-  await myBanner.load();
-
-  await endBanner.load();
+  settingBanner.load();
+  endBanner.load();
+  historyBanner.load();
+  moreAppsBanner.load();
 
   await InterstitialAd.load(adUnitId: settingInterAdId,
       request: const AdRequest(),
@@ -182,6 +214,31 @@ void main() async {
       ));
 
   loadInterAd?.fullScreenContentCallback = FullScreenContentCallback(
+    onAdShowedFullScreenContent: (InterstitialAd ad) =>
+        print('$ad onAdShowedFullScreenContent.'),
+    onAdDismissedFullScreenContent: (InterstitialAd ad) {
+      print('$ad onAdDismissedFullScreenContent.');
+      ad.dispose();
+    },
+    onAdFailedToShowFullScreenContent: (InterstitialAd ad, AdError error) {
+      print('$ad onAdFailedToShowFullScreenContent: $error');
+      ad.dispose();
+    },
+    onAdImpression: (InterstitialAd ad) => print('$ad impression occurred.'),
+  );
+
+  await InterstitialAd.load(adUnitId: moreAppsInterAdId,
+      request: const AdRequest(),
+      adLoadCallback: InterstitialAdLoadCallback(
+        onAdLoaded: (ad) {
+          moreAppsInterAd=ad;
+        },
+        onAdFailedToLoad: (error) {
+          moreAppsInterAd = null;
+        },
+      ));
+
+  moreAppsInterAd?.fullScreenContentCallback = FullScreenContentCallback(
     onAdShowedFullScreenContent: (InterstitialAd ad) =>
         print('$ad onAdShowedFullScreenContent.'),
     onAdDismissedFullScreenContent: (InterstitialAd ad) {
@@ -602,6 +659,13 @@ class _HomePageState extends State<HomePage>
       );
     });
     checkForInitialMessage();
+
+    if (defaultTargetPlatform == TargetPlatform.iOS) {
+      more_apps_icon = Icon(FlutterIcons.app_store_ent);
+    } else {
+      more_apps_icon = Icon(FlutterIcons.android1_ant);
+    }
+
   }
 
   @override
@@ -610,14 +674,162 @@ class _HomePageState extends State<HomePage>
     super.dispose();
   }
 
-  Future<Widget> settingPage(BuildContext context) async {
+  Widget formulaHistory() {
+    List<String> expressionList = prefs.getStringList('expressionList') ?? [];
+    List<String> resultList = prefs.getStringList('resultList') ?? [];
+    List<String> mathModelNameList = prefs.getStringList('mathModelNameList') ?? [];
+    List<String> mathBoxList = prefs.getStringList('mathBoxList') ?? [];
 
-    if (settingInterAd != null) {
-      await settingInterAd!.show();
-    }
-
-    final AdWidget bannerWidget = AdWidget(ad: myBanner);
     return Scaffold(
+      resizeToAvoidBottomInset : false,
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(15.0),
+        child: AppBar(
+          elevation: 0.0,
+          backgroundColor: Colors.transparent,
+        ),
+      ),
+      body: Column(
+        children: [
+          Expanded(
+            child: ListView.builder(
+              shrinkWrap: true,
+              itemCount: mathModelNameList.length,
+              itemBuilder: (BuildContext context, int index) {
+                return Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(5.0),
+                    child: ListTile(
+                      title: Text(mathModelNameList[index]),
+                      trailing: SizedBox(
+                        width: 100,
+                        child: Row(
+                          children: [
+                            IconButton(
+                              icon: const Icon(
+                                FontAwesomeIcons.download,
+                                color: Colors.blue,),
+                              onPressed: () {
+                                showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return AlertDialog(
+                                      title: Text(CsvLocalizations.instance.string('alert')),
+                                      content: Text(CsvLocalizations.instance.string('load_this')),
+                                      actions: <Widget>[
+                                        FlatButton(
+                                          color: Colors.green,
+                                          textColor: Colors.white,
+                                          child: Text(CsvLocalizations.instance.string('ok')),
+                                          onPressed: () {
+                                            setState(() {
+                                              final mathModel = Provider.of<MathModel>(context, listen: false);
+                                              mathModel.updateExpression(expressionList[index]);
+                                              mathModel.setResult(resultList[index]);
+                                              mathModel.calcNumber();
+                                              final mathBoxController = Provider.of<MathBoxController>(context, listen:false);
+                                              mathBoxController.decodeMathBoxHistory(mathBoxList[index]);
+                                              mathBoxController.loadSavedHistory();
+                                              Navigator.pop(context);
+                                              return _showDialog(
+                                                  CsvLocalizations.instance.string('success'),
+                                                  CsvLocalizations.instance.string('formula_loaded')
+                                              );
+                                            });
+                                          },
+                                        ),
+                                        FlatButton(
+                                          color: Colors.red,
+                                          textColor: Colors.white,
+                                          child: Text(CsvLocalizations.instance.string('cancel')),
+                                          onPressed: () {
+                                            setState(() {
+                                              Navigator.pop(context);
+                                            });
+                                          },
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                );
+                              },
+                            ),
+                            IconButton(
+                              icon: const Icon(
+                                FontAwesomeIcons.trashAlt,
+                                color: Colors.red,),
+                              onPressed: () {
+                                showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    // return object of type Dialog
+                                    return AlertDialog(
+                                      title: Text(CsvLocalizations.instance.string('alert')),
+                                      content: Text(CsvLocalizations.instance.string('remove_this')),
+                                      actions: <Widget>[
+                                        FlatButton(
+                                          color: Colors.green,
+                                          textColor: Colors.white,
+                                          child: Text(CsvLocalizations.instance.string('ok')),
+                                          onPressed: () {
+                                            setState(() {
+                                              // remove mathmode
+                                              mathModelNameList.removeAt(index);
+                                              expressionList.removeAt(index);
+                                              resultList.removeAt(index);
+                                              mathBoxList.removeAt(index);
+                                              prefs.setStringList("mathModelNameList", mathModelNameList);
+                                              prefs.setStringList("expressionList", expressionList);
+                                              prefs.setStringList("resultList", resultList);
+                                              prefs.setStringList("mathBoxList", mathBoxList);
+                                              Navigator.pop(context);
+                                              return _showDialog(
+                                                  CsvLocalizations.instance.string('success'),
+                                                  CsvLocalizations.instance.string('formula_removed')
+                                              );
+                                            });
+                                          },
+                                        ),
+                                        FlatButton(
+                                          color: Colors.red,
+                                          textColor: Colors.white,
+                                          child: Text(CsvLocalizations.instance.string('cancel')),
+                                          onPressed: () {
+                                            setState(() {
+                                              Navigator.pop(context);
+                                            });
+                                          },
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                );
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+          Container(
+            height: 30,
+          ),
+          Container(
+              height: 250,
+              child: AdWidget(ad: historyBanner)
+          )
+        ],
+      )
+    );
+  }
+
+  Widget settingPage() {
+    return Scaffold(
+      resizeToAvoidBottomInset : false,
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(15.0),
         child: AppBar(
@@ -656,7 +868,7 @@ class _HomePageState extends State<HomePage>
               ),
             ),
           ),
-          SizedBox(height: 100),
+          SizedBox(height: 50),
           Consumer<SettingModel>(
             builder: (context, setmodel, _) => ListTile(
               title: Text(
@@ -677,7 +889,7 @@ class _HomePageState extends State<HomePage>
               trailing: Text('${setmodel.precision.toInt()}'),
             ),
           ),
-          const SizedBox(height: 100),
+          const SizedBox(height: 50),
           ListTile(
             leading: Text(
               CsvLocalizations.instance.string('function_keyboard'),
@@ -712,7 +924,7 @@ class _HomePageState extends State<HomePage>
                 },
               ),
             ),
-          ),const SizedBox(height: 100),
+          ),const SizedBox(height: 50),
           ListTile(
             leading: Text(
               CsvLocalizations.instance.string('number_keyboard'),
@@ -748,188 +960,36 @@ class _HomePageState extends State<HomePage>
               ),
             ),
           ),
-          bannerWidget
+          Container(
+            height: 50,
+            child: AdWidget(ad: settingBanner)
+          )
         ],
       ),
     );
   }
 
-  Widget settingPage2() {
-    final AdWidget bannerWidget = AdWidget(ad: myBanner);
-    return Scaffold(
-      appBar: PreferredSize(
-        preferredSize: Size.fromHeight(15.0),
-        child: AppBar(
-          elevation: 0.0,
-          backgroundColor: Colors.transparent,
-        ),
-      ),
-      body: ListView(
-        itemExtent: 60.0,
-        physics: const NeverScrollableScrollPhysics(),
-        padding: const EdgeInsets.symmetric(horizontal: 10.0),
-        children: <Widget>[
-          ListTile(
-            leading: Text(
-              CsvLocalizations.instance.string('calc_setting'),
-              style: const TextStyle(
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ),
-          Consumer<SettingModel>(
-            builder: (context, setmodel, _) => ListTile(
-              title: ToggleButtons(
-                children: const <Widget>[
-                  Text('RAD'),
-                  Text('DEG'),
-                ],
-                constraints: const BoxConstraints(
-                  minWidth: 100,
-                  minHeight: 40,
-                ),
-                isSelected: [setmodel.isRadMode, !setmodel.isRadMode],
-                onPressed: (index) {
-                  setmodel.changeRadMode((index==0)?true:false);
-                },
-              ),
-            ),
-          ),
-          SizedBox(height: 100),
-          Consumer<SettingModel>(
-            builder: (context, setmodel, _) => ListTile(
-              title: Text(
-                CsvLocalizations.instance.string('calc_precision'),
-                style: TextStyle(
-                  fontWeight: FontWeight.w700,
-                ),),
-              subtitle: Slider(
-                value: setmodel.precision.toDouble(),
-                min: 0.0,
-                max: 10.0,
-                label: "${setmodel.precision.toInt()}",
-                divisions: 10,
-                onChanged: (val) {
-                  setmodel.changeSlider(val);
-                },
-              ),
-              trailing: Text('${setmodel.precision.toInt()}'),
-            ),
-          ),
-          const SizedBox(height: 100),
-          ListTile(
-            leading: Text(
-              CsvLocalizations.instance.string('function_keyboard'),
-              style: TextStyle(
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ),
-          Consumer<SettingModel>(
-            builder: (context, setmodel, _) => ListTile(
-              title: ToggleButtons(
-                children: <Widget>[
-                  Text(CsvLocalizations.instance.string('brown')),
-                  Text(CsvLocalizations.instance.string('black')),
-                  Text(CsvLocalizations.instance.string('red')),
-                  Text(CsvLocalizations.instance.string('blue')),
-                  Text(CsvLocalizations.instance.string('orange')),
-                ],
-                constraints: const BoxConstraints(
-                  minWidth: 55,
-                  minHeight: 40,
-                ),
-                isSelected: [
-                  setmodel.functionColorList[0],
-                  setmodel.functionColorList[1],
-                  setmodel.functionColorList[2],
-                  setmodel.functionColorList[3],
-                  setmodel.functionColorList[4],
-                ],
-                onPressed: (index) {
-                  setmodel.changeFunctionColor(index);
-                },
-              ),
-            ),
-          ),const SizedBox(height: 100),
-          ListTile(
-            leading: Text(
-              CsvLocalizations.instance.string('number_keyboard'),
-              style: TextStyle(
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ),
-          Consumer<SettingModel>(
-            builder: (context, setmodel, _) => ListTile(
-              title: ToggleButtons(
-                children: <Widget>[
-                  Text(CsvLocalizations.instance.string('brown')),
-                  Text(CsvLocalizations.instance.string('black')),
-                  Text(CsvLocalizations.instance.string('red')),
-                  Text(CsvLocalizations.instance.string('blue')),
-                  Text(CsvLocalizations.instance.string('orange')),
-                ],
-                constraints: const BoxConstraints(
-                  minWidth: 55,
-                  minHeight: 40,
-                ),
-                isSelected: [
-                  setmodel.numberColorList[0],
-                  setmodel.numberColorList[1],
-                  setmodel.numberColorList[2],
-                  setmodel.numberColorList[3],
-                  setmodel.numberColorList[4],
-                ],
-                onPressed: (index) {
-                  setmodel.changeNumberColor(index);
-                },
-              ),
-            ),
-          ),
-          bannerWidget
-        ],
-      ),
-    );
-  }
-
-  final PageController pageController = PageController(initialPage: 0);
   int _selectedIndex=0;
 
   void _onItemTapped (int index) async {
-
     setState(() {
-      if (index == 0) {
-        _selectedIndex = 0;
-      } else if (index == 1) {
-        _selectedIndex = 1;
-        settingPage(context);
-      } else if (index == 2) {
-        index = 0;
-        _displaySavedListDialog(context);
-      } else if (index == 3) {
-
-      }
       _selectedIndex=index;
     });
-    pageController.animateToPage(
-      index,
-      curve: Curves.easeIn,
-      duration: const Duration(milliseconds: 100),);
-  }
-
-  Future<void> _displaySavedListDialog(BuildContext context) async {
-    if (loadInterAd != null) {
-      await loadInterAd!.show();
+    if (index == 1) {
+      if (settingInterAd != null) {
+        await settingInterAd!.show();
+      }
     }
-    await showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text(CsvLocalizations.instance.string('formula_list')),
-            content: setupAlertDialoadContainer(),
-          );
-        });
+    if (index == 2) {
+      if (loadInterAd != null) {
+        await loadInterAd!.show();
+      }
+    }
+    if (index == 3) {
+      if (moreAppsInterAd != null) {
+        await moreAppsInterAd!.show();
+      }
+    }
   }
 
   @override
@@ -980,6 +1040,7 @@ class _HomePageState extends State<HomePage>
         return new Future(() => false);
       },
       child: Scaffold(
+        resizeToAvoidBottomInset : false,
         body: IndexedStack(
           index: _selectedIndex,
           children: [
@@ -1017,10 +1078,13 @@ class _HomePageState extends State<HomePage>
                 ],
               ),
             ),
-            settingPage2(),
+            settingPage(),
+            formulaHistory(),
+            MoreApps(moreAppsBanner: moreAppsBanner),
           ],
         ),
-        bottomNavigationBar: BottomNavigationBar(onTap: _onItemTapped,
+        bottomNavigationBar: BottomNavigationBar(
+            onTap: _onItemTapped,
             currentIndex: _selectedIndex,
             type: BottomNavigationBarType.fixed,
             items: <BottomNavigationBarItem>[
@@ -1033,8 +1097,12 @@ class _HomePageState extends State<HomePage>
                   title: Text(CsvLocalizations.instance.string('setting'))
               ),
               BottomNavigationBarItem(
-                  icon: Icon(FontAwesomeIcons.download),
-                  title: Text(CsvLocalizations.instance.string('load'))
+                  icon: Icon(FontAwesomeIcons.history),
+                  title: Text(CsvLocalizations.instance.string('history'))
+              ),
+              BottomNavigationBarItem(
+                icon: more_apps_icon,
+                title: Text(CsvLocalizations.instance.string('moreApps')),
               ),
             ]),
       ),

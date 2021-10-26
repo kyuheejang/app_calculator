@@ -1,4 +1,4 @@
-import 'package:app_calculator/app_open_ad_manager.dart';
+import 'package:app_calculator/ad/app_open_ad_manager.dart';
 import 'package:flutter/material.dart';
 
 class AppLifecycleReactor extends WidgetsBindingObserver {
