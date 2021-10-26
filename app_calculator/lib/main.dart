@@ -610,269 +610,286 @@ class _HomePageState extends State<HomePage>
     super.dispose();
   }
 
-  Future<ListView> settingPage(BuildContext context) async {
+  Future<Widget> settingPage(BuildContext context) async {
 
     if (settingInterAd != null) {
       await settingInterAd!.show();
     }
 
     final AdWidget bannerWidget = AdWidget(ad: myBanner);
-    return ListView(
-      itemExtent: 60.0,
-      physics: const NeverScrollableScrollPhysics(),
-      padding: const EdgeInsets.symmetric(horizontal: 10.0),
-      children: <Widget>[
-        ListTile(
-          leading: Text(
-            CsvLocalizations.instance.string('calc_setting'),
-            style: const TextStyle(
-              fontWeight: FontWeight.w700,
-            ),
-          ),
+    return Scaffold(
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(15.0),
+        child: AppBar(
+          elevation: 0.0,
+          backgroundColor: Colors.transparent,
         ),
-        Consumer<SettingModel>(
-          builder: (context, setmodel, _) => ListTile(
-            title: ToggleButtons(
-              children: const <Widget>[
-                Text('RAD'),
-                Text('DEG'),
-              ],
-              constraints: const BoxConstraints(
-                minWidth: 100,
-                minHeight: 40,
+      ),
+      body: ListView(
+        itemExtent: 60.0,
+        physics: const NeverScrollableScrollPhysics(),
+        padding: const EdgeInsets.symmetric(horizontal: 10.0),
+        children: <Widget>[
+          ListTile(
+            leading: Text(
+              CsvLocalizations.instance.string('calc_setting'),
+              style: const TextStyle(
+                fontWeight: FontWeight.w700,
               ),
-              isSelected: [setmodel.isRadMode, !setmodel.isRadMode],
-              onPressed: (index) {
-                setmodel.changeRadMode((index==0)?true:false);
-              },
             ),
           ),
-        ),
-        SizedBox(height: 100),
-        Consumer<SettingModel>(
-          builder: (context, setmodel, _) => ListTile(
-            title: Text(
-              CsvLocalizations.instance.string('calc_precision'),
+          Consumer<SettingModel>(
+            builder: (context, setmodel, _) => ListTile(
+              title: ToggleButtons(
+                children: const <Widget>[
+                  Text('RAD'),
+                  Text('DEG'),
+                ],
+                constraints: const BoxConstraints(
+                  minWidth: 100,
+                  minHeight: 40,
+                ),
+                isSelected: [setmodel.isRadMode, !setmodel.isRadMode],
+                onPressed: (index) {
+                  setmodel.changeRadMode((index==0)?true:false);
+                },
+              ),
+            ),
+          ),
+          SizedBox(height: 100),
+          Consumer<SettingModel>(
+            builder: (context, setmodel, _) => ListTile(
+              title: Text(
+                CsvLocalizations.instance.string('calc_precision'),
+                style: TextStyle(
+                  fontWeight: FontWeight.w700,
+                ),),
+              subtitle: Slider(
+                value: setmodel.precision.toDouble(),
+                min: 0.0,
+                max: 10.0,
+                label: "${setmodel.precision.toInt()}",
+                divisions: 10,
+                onChanged: (val) {
+                  setmodel.changeSlider(val);
+                },
+              ),
+              trailing: Text('${setmodel.precision.toInt()}'),
+            ),
+          ),
+          const SizedBox(height: 100),
+          ListTile(
+            leading: Text(
+              CsvLocalizations.instance.string('function_keyboard'),
               style: TextStyle(
                 fontWeight: FontWeight.w700,
-              ),),
-            subtitle: Slider(
-              value: setmodel.precision.toDouble(),
-              min: 0.0,
-              max: 10.0,
-              label: "${setmodel.precision.toInt()}",
-              divisions: 10,
-              onChanged: (val) {
-                setmodel.changeSlider(val);
-              },
-            ),
-            trailing: Text('${setmodel.precision.toInt()}'),
-          ),
-        ),
-        const SizedBox(height: 100),
-        ListTile(
-          leading: Text(
-            CsvLocalizations.instance.string('function_keyboard'),
-            style: TextStyle(
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-        ),
-        Consumer<SettingModel>(
-          builder: (context, setmodel, _) => ListTile(
-            title: ToggleButtons(
-              children: <Widget>[
-                Text(CsvLocalizations.instance.string('brown')),
-                Text(CsvLocalizations.instance.string('black')),
-                Text(CsvLocalizations.instance.string('red')),
-                Text(CsvLocalizations.instance.string('blue')),
-                Text(CsvLocalizations.instance.string('orange')),
-              ],
-              constraints: const BoxConstraints(
-                minWidth: 55,
-                minHeight: 40,
               ),
-              isSelected: [
-                setmodel.functionColorList[0],
-                setmodel.functionColorList[1],
-                setmodel.functionColorList[2],
-                setmodel.functionColorList[3],
-                setmodel.functionColorList[4],
-              ],
-              onPressed: (index) {
-                setmodel.changeFunctionColor(index);
-              },
             ),
           ),
-        ),const SizedBox(height: 100),
-        ListTile(
-          leading: Text(
-            CsvLocalizations.instance.string('number_keyboard'),
-            style: TextStyle(
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-        ),
-        Consumer<SettingModel>(
-          builder: (context, setmodel, _) => ListTile(
-            title: ToggleButtons(
-              children: <Widget>[
-                Text(CsvLocalizations.instance.string('brown')),
-                Text(CsvLocalizations.instance.string('black')),
-                Text(CsvLocalizations.instance.string('red')),
-                Text(CsvLocalizations.instance.string('blue')),
-                Text(CsvLocalizations.instance.string('orange')),
-              ],
-              constraints: const BoxConstraints(
-                minWidth: 55,
-                minHeight: 40,
+          Consumer<SettingModel>(
+            builder: (context, setmodel, _) => ListTile(
+              title: ToggleButtons(
+                children: <Widget>[
+                  Text(CsvLocalizations.instance.string('brown')),
+                  Text(CsvLocalizations.instance.string('black')),
+                  Text(CsvLocalizations.instance.string('red')),
+                  Text(CsvLocalizations.instance.string('blue')),
+                  Text(CsvLocalizations.instance.string('orange')),
+                ],
+                constraints: const BoxConstraints(
+                  minWidth: 55,
+                  minHeight: 40,
+                ),
+                isSelected: [
+                  setmodel.functionColorList[0],
+                  setmodel.functionColorList[1],
+                  setmodel.functionColorList[2],
+                  setmodel.functionColorList[3],
+                  setmodel.functionColorList[4],
+                ],
+                onPressed: (index) {
+                  setmodel.changeFunctionColor(index);
+                },
               ),
-              isSelected: [
-                setmodel.numberColorList[0],
-                setmodel.numberColorList[1],
-                setmodel.numberColorList[2],
-                setmodel.numberColorList[3],
-                setmodel.numberColorList[4],
-              ],
-              onPressed: (index) {
-                setmodel.changeNumberColor(index);
-              },
+            ),
+          ),const SizedBox(height: 100),
+          ListTile(
+            leading: Text(
+              CsvLocalizations.instance.string('number_keyboard'),
+              style: TextStyle(
+                fontWeight: FontWeight.w700,
+              ),
             ),
           ),
-        ),
-        bannerWidget
-      ],
+          Consumer<SettingModel>(
+            builder: (context, setmodel, _) => ListTile(
+              title: ToggleButtons(
+                children: <Widget>[
+                  Text(CsvLocalizations.instance.string('brown')),
+                  Text(CsvLocalizations.instance.string('black')),
+                  Text(CsvLocalizations.instance.string('red')),
+                  Text(CsvLocalizations.instance.string('blue')),
+                  Text(CsvLocalizations.instance.string('orange')),
+                ],
+                constraints: const BoxConstraints(
+                  minWidth: 55,
+                  minHeight: 40,
+                ),
+                isSelected: [
+                  setmodel.numberColorList[0],
+                  setmodel.numberColorList[1],
+                  setmodel.numberColorList[2],
+                  setmodel.numberColorList[3],
+                  setmodel.numberColorList[4],
+                ],
+                onPressed: (index) {
+                  setmodel.changeNumberColor(index);
+                },
+              ),
+            ),
+          ),
+          bannerWidget
+        ],
+      ),
     );
   }
 
   Widget settingPage2() {
-
     final AdWidget bannerWidget = AdWidget(ad: myBanner);
-    return ListView(
-      itemExtent: 60.0,
-      physics: const NeverScrollableScrollPhysics(),
-      padding: const EdgeInsets.symmetric(horizontal: 10.0),
-      children: <Widget>[
-        ListTile(
-          leading: Text(
-            CsvLocalizations.instance.string('calc_setting'),
-            style: const TextStyle(
-              fontWeight: FontWeight.w700,
-            ),
-          ),
+    return Scaffold(
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(15.0),
+        child: AppBar(
+          elevation: 0.0,
+          backgroundColor: Colors.transparent,
         ),
-        Consumer<SettingModel>(
-          builder: (context, setmodel, _) => ListTile(
-            title: ToggleButtons(
-              children: const <Widget>[
-                Text('RAD'),
-                Text('DEG'),
-              ],
-              constraints: const BoxConstraints(
-                minWidth: 100,
-                minHeight: 40,
+      ),
+      body: ListView(
+        itemExtent: 60.0,
+        physics: const NeverScrollableScrollPhysics(),
+        padding: const EdgeInsets.symmetric(horizontal: 10.0),
+        children: <Widget>[
+          ListTile(
+            leading: Text(
+              CsvLocalizations.instance.string('calc_setting'),
+              style: const TextStyle(
+                fontWeight: FontWeight.w700,
               ),
-              isSelected: [setmodel.isRadMode, !setmodel.isRadMode],
-              onPressed: (index) {
-                setmodel.changeRadMode((index==0)?true:false);
-              },
             ),
           ),
-        ),
-        SizedBox(height: 100),
-        Consumer<SettingModel>(
-          builder: (context, setmodel, _) => ListTile(
-            title: Text(
-              CsvLocalizations.instance.string('calc_precision'),
+          Consumer<SettingModel>(
+            builder: (context, setmodel, _) => ListTile(
+              title: ToggleButtons(
+                children: const <Widget>[
+                  Text('RAD'),
+                  Text('DEG'),
+                ],
+                constraints: const BoxConstraints(
+                  minWidth: 100,
+                  minHeight: 40,
+                ),
+                isSelected: [setmodel.isRadMode, !setmodel.isRadMode],
+                onPressed: (index) {
+                  setmodel.changeRadMode((index==0)?true:false);
+                },
+              ),
+            ),
+          ),
+          SizedBox(height: 100),
+          Consumer<SettingModel>(
+            builder: (context, setmodel, _) => ListTile(
+              title: Text(
+                CsvLocalizations.instance.string('calc_precision'),
+                style: TextStyle(
+                  fontWeight: FontWeight.w700,
+                ),),
+              subtitle: Slider(
+                value: setmodel.precision.toDouble(),
+                min: 0.0,
+                max: 10.0,
+                label: "${setmodel.precision.toInt()}",
+                divisions: 10,
+                onChanged: (val) {
+                  setmodel.changeSlider(val);
+                },
+              ),
+              trailing: Text('${setmodel.precision.toInt()}'),
+            ),
+          ),
+          const SizedBox(height: 100),
+          ListTile(
+            leading: Text(
+              CsvLocalizations.instance.string('function_keyboard'),
               style: TextStyle(
                 fontWeight: FontWeight.w700,
-              ),),
-            subtitle: Slider(
-              value: setmodel.precision.toDouble(),
-              min: 0.0,
-              max: 10.0,
-              label: "${setmodel.precision.toInt()}",
-              divisions: 10,
-              onChanged: (val) {
-                setmodel.changeSlider(val);
-              },
-            ),
-            trailing: Text('${setmodel.precision.toInt()}'),
-          ),
-        ),
-        const SizedBox(height: 100),
-        ListTile(
-          leading: Text(
-            CsvLocalizations.instance.string('function_keyboard'),
-            style: TextStyle(
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-        ),
-        Consumer<SettingModel>(
-          builder: (context, setmodel, _) => ListTile(
-            title: ToggleButtons(
-              children: <Widget>[
-                Text(CsvLocalizations.instance.string('brown')),
-                Text(CsvLocalizations.instance.string('black')),
-                Text(CsvLocalizations.instance.string('red')),
-                Text(CsvLocalizations.instance.string('blue')),
-                Text(CsvLocalizations.instance.string('orange')),
-              ],
-              constraints: const BoxConstraints(
-                minWidth: 55,
-                minHeight: 40,
               ),
-              isSelected: [
-                setmodel.functionColorList[0],
-                setmodel.functionColorList[1],
-                setmodel.functionColorList[2],
-                setmodel.functionColorList[3],
-                setmodel.functionColorList[4],
-              ],
-              onPressed: (index) {
-                setmodel.changeFunctionColor(index);
-              },
             ),
           ),
-        ),const SizedBox(height: 100),
-        ListTile(
-          leading: Text(
-            CsvLocalizations.instance.string('number_keyboard'),
-            style: TextStyle(
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-        ),
-        Consumer<SettingModel>(
-          builder: (context, setmodel, _) => ListTile(
-            title: ToggleButtons(
-              children: <Widget>[
-                Text(CsvLocalizations.instance.string('brown')),
-                Text(CsvLocalizations.instance.string('black')),
-                Text(CsvLocalizations.instance.string('red')),
-                Text(CsvLocalizations.instance.string('blue')),
-                Text(CsvLocalizations.instance.string('orange')),
-              ],
-              constraints: const BoxConstraints(
-                minWidth: 55,
-                minHeight: 40,
+          Consumer<SettingModel>(
+            builder: (context, setmodel, _) => ListTile(
+              title: ToggleButtons(
+                children: <Widget>[
+                  Text(CsvLocalizations.instance.string('brown')),
+                  Text(CsvLocalizations.instance.string('black')),
+                  Text(CsvLocalizations.instance.string('red')),
+                  Text(CsvLocalizations.instance.string('blue')),
+                  Text(CsvLocalizations.instance.string('orange')),
+                ],
+                constraints: const BoxConstraints(
+                  minWidth: 55,
+                  minHeight: 40,
+                ),
+                isSelected: [
+                  setmodel.functionColorList[0],
+                  setmodel.functionColorList[1],
+                  setmodel.functionColorList[2],
+                  setmodel.functionColorList[3],
+                  setmodel.functionColorList[4],
+                ],
+                onPressed: (index) {
+                  setmodel.changeFunctionColor(index);
+                },
               ),
-              isSelected: [
-                setmodel.numberColorList[0],
-                setmodel.numberColorList[1],
-                setmodel.numberColorList[2],
-                setmodel.numberColorList[3],
-                setmodel.numberColorList[4],
-              ],
-              onPressed: (index) {
-                setmodel.changeNumberColor(index);
-              },
+            ),
+          ),const SizedBox(height: 100),
+          ListTile(
+            leading: Text(
+              CsvLocalizations.instance.string('number_keyboard'),
+              style: TextStyle(
+                fontWeight: FontWeight.w700,
+              ),
             ),
           ),
-        ),
-        bannerWidget
-      ],
+          Consumer<SettingModel>(
+            builder: (context, setmodel, _) => ListTile(
+              title: ToggleButtons(
+                children: <Widget>[
+                  Text(CsvLocalizations.instance.string('brown')),
+                  Text(CsvLocalizations.instance.string('black')),
+                  Text(CsvLocalizations.instance.string('red')),
+                  Text(CsvLocalizations.instance.string('blue')),
+                  Text(CsvLocalizations.instance.string('orange')),
+                ],
+                constraints: const BoxConstraints(
+                  minWidth: 55,
+                  minHeight: 40,
+                ),
+                isSelected: [
+                  setmodel.numberColorList[0],
+                  setmodel.numberColorList[1],
+                  setmodel.numberColorList[2],
+                  setmodel.numberColorList[3],
+                  setmodel.numberColorList[4],
+                ],
+                onPressed: (index) {
+                  setmodel.changeNumberColor(index);
+                },
+              ),
+            ),
+          ),
+          bannerWidget
+        ],
+      ),
     );
   }
 
@@ -889,10 +906,9 @@ class _HomePageState extends State<HomePage>
         settingPage(context);
       } else if (index == 2) {
         index = 0;
-        _displayTextInputDialog(context);
-      } else if (index == 3) {
-        index = 0;
         _displaySavedListDialog(context);
+      } else if (index == 3) {
+
       }
       _selectedIndex=index;
     });
@@ -919,59 +935,6 @@ class _HomePageState extends State<HomePage>
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-      child: Scaffold(
-        resizeToAvoidBottomInset : false,
-        appBar: PreferredSize(
-          preferredSize: Size.fromHeight(15.0),
-          child: AppBar(
-            elevation: 0.0,
-            backgroundColor: Colors.transparent,
-          ),
-        ),
-        body: PageView(
-          physics:const NeverScrollableScrollPhysics(),
-          controller: pageController,
-          children: [
-              Column(
-              children: <Widget>[
-              Expanded(
-                flex: 10,
-                child: Stack(
-                  alignment: Alignment.bottomCenter,
-                  children: const <Widget>[
-                    MathBox(),
-                    SlidComponent(),
-                  ],
-                ),
-              ),
-              MathKeyBoard()
-              ],
-            ),
-            settingPage2(),
-          ],
-        ),
-        bottomNavigationBar: BottomNavigationBar(onTap: _onItemTapped,
-            currentIndex: _selectedIndex,
-            type: BottomNavigationBarType.fixed,
-            items: <BottomNavigationBarItem>[
-              BottomNavigationBarItem(
-                  icon: Icon(FlutterIcons.md_calculator_ion),
-                  title: Text(CsvLocalizations.instance.string('calculator'))
-              ),
-              BottomNavigationBarItem(
-                  icon: Icon(FlutterIcons.setting_ant),
-                  title: Text(CsvLocalizations.instance.string('setting'))
-              ),
-              BottomNavigationBarItem(
-                  icon: Icon(FontAwesomeIcons.save,),
-                  title: Text(CsvLocalizations.instance.string('save'))
-              ),
-              BottomNavigationBarItem(
-                  icon: Icon(FontAwesomeIcons.download),
-                  title: Text(CsvLocalizations.instance.string('load'))
-              ),
-            ]),
-      ),
       onWillPop: () {
         showDialog(
           context: context,
@@ -1016,6 +979,65 @@ class _HomePageState extends State<HomePage>
         );
         return new Future(() => false);
       },
+      child: Scaffold(
+        body: IndexedStack(
+          index: _selectedIndex,
+          children: [
+            Scaffold(
+              resizeToAvoidBottomInset : false,
+              appBar: AppBar(
+                elevation: 0.0,
+                backgroundColor: Colors.transparent,
+                actions: <Widget>[
+                  IconButton(
+                    tooltip: CsvLocalizations.instance.string('save'),
+                    onPressed: () {
+                      _displayTextInputDialog(context);
+                    },
+                    icon: Icon(
+                      FontAwesomeIcons.save,
+                      color: Colors.black,
+                    ),
+                  )
+                ],
+              ),
+              body: Column(
+                children: <Widget>[
+                  Expanded(
+                    flex: 10,
+                    child: Stack(
+                      alignment: Alignment.bottomCenter,
+                      children: const <Widget>[
+                        MathBox(),
+                        SlidComponent(),
+                      ],
+                    ),
+                  ),
+                  MathKeyBoard()
+                ],
+              ),
+            ),
+            settingPage2(),
+          ],
+        ),
+        bottomNavigationBar: BottomNavigationBar(onTap: _onItemTapped,
+            currentIndex: _selectedIndex,
+            type: BottomNavigationBarType.fixed,
+            items: <BottomNavigationBarItem>[
+              BottomNavigationBarItem(
+                  icon: Icon(FlutterIcons.md_calculator_ion),
+                  title: Text(CsvLocalizations.instance.string('calculator'))
+              ),
+              BottomNavigationBarItem(
+                  icon: Icon(FlutterIcons.setting_ant),
+                  title: Text(CsvLocalizations.instance.string('setting'))
+              ),
+              BottomNavigationBarItem(
+                  icon: Icon(FontAwesomeIcons.download),
+                  title: Text(CsvLocalizations.instance.string('load'))
+              ),
+            ]),
+      ),
     );
   }
 }
