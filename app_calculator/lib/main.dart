@@ -35,6 +35,7 @@ String formulaSaveInterAdId = "";
 String formulaLoadInterAdId = "";
 String settingBannerAdId = "";
 String historyBannerAdId = "";
+String mainBannerAdId = "";
 String moreAppsInterAdId = "";
 String openingAdId = "";
 String moreAppsBannerAdId = "";
@@ -94,6 +95,13 @@ final BannerAd moreAppsBanner = BannerAd(
   listener: const BannerAdListener(),
 );
 
+final BannerAd mainBanner = BannerAd(
+  adUnitId: mainBannerAdId,
+  size: AdSize.banner,
+  request: const AdRequest(),
+  listener: const BannerAdListener(),
+);
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final status = await AppTrackingTransparency.requestTrackingAuthorization();
@@ -114,9 +122,9 @@ void main() async {
       formulaLoadInterAdId = value.data()?['iosFormulaLoadInter'];
       moreAppsInterAdId = value.data()?['iosMoreAppsInter'];
       moreAppsBannerAdId = value.data()?['iosMoreAppsBanner'];
-      openingAdId = value.data()?['iosOpening'];
       endBannerAdId = value.data()?['iosEndBanner'];
       historyBannerAdId = value.data()?['iosHistoryBanner'];
+      mainBannerAdId = value.data()?['iosMainBanner'];
     } else {
       settingInterAdId = value.data()?['andSettingInter'];
       settingBannerAdId = value.data()?['andSettingBanner'];
@@ -124,33 +132,30 @@ void main() async {
       formulaLoadInterAdId = value.data()?['andFormulaLoadInter'];
       moreAppsInterAdId = value.data()?['andMoreAppsInter'];
       moreAppsBannerAdId = value.data()?['andMoreAppsBanner'];
-      openingAdId = value.data()?['andOpening'];
       endBannerAdId = value.data()?['andEndBanner'];
       historyBannerAdId = value.data()?['andHistoryBanner'];
+      mainBannerAdId = value.data()?['andMainBanner'];
     }
   } else {
     settingInterAdId = testInitialAdId;
     formulaSaveInterAdId = testInitialAdId;
     formulaLoadInterAdId = testInitialAdId;
     settingBannerAdId = testBannerAdId;
-    openingAdId = testOpeningAdId;
     endBannerAdId = testBannerAdId;
     historyBannerAdId = testBannerAdId;
     moreAppsInterAdId = testInitialAdId;
     moreAppsBannerAdId = testBannerAdId;
+    mainBannerAdId = testBannerAdId;
   }
 
   await MobileAds.instance.initialize();
   await MobileAds.instance.setAppMuted(true);
 
-  AppOpenAdManager appOpenAdManager = AppOpenAdManager(adUnitId: openingAdId)..loadAd();
-  WidgetsBinding.instance!
-      .addObserver(AppLifecycleReactor(appOpenAdManager: appOpenAdManager));
-
   settingBanner.load();
   endBanner.load();
   historyBanner.load();
   moreAppsBanner.load();
+  mainBanner.load();
 
   await InterstitialAd.load(adUnitId: settingInterAdId,
       request: const AdRequest(),
@@ -457,12 +462,11 @@ class _HomePageState extends State<HomePage>
                     prefs.setStringList("resultList", resultList);
                     prefs.setStringList("mathBoxList", mathBoxList);
                     _textFieldController.clear();
-                    Navigator.pop(context);
-                    return _showDialog(
-                        CsvLocalizations.instance.string('success'),
-                        CsvLocalizations.instance.string('formula_saved'),
-                    );
                   });
+                  return _showDialog2(
+                    CsvLocalizations.instance.string('success'),
+                    CsvLocalizations.instance.string('formula_saved'),
+                  );
                 },
               ),
               FlatButton(
@@ -493,6 +497,28 @@ class _HomePageState extends State<HomePage>
               child:Text(CsvLocalizations.instance.string('close')),
               onPressed: () {
                 Navigator.pop(context);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showDialog2(String title, String body) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        // return object of type Dialog
+        return AlertDialog(
+          title: new Text(title),
+          content: new Text(body),
+          actions: <Widget>[
+            new FlatButton(
+              child:Text(CsvLocalizations.instance.string('close')),
+              onPressed: () {
+                int count = 2;
+                Navigator.of(context).popUntil((_) => count-- <= 0);
               },
             ),
           ],
@@ -1000,40 +1026,59 @@ class _HomePageState extends State<HomePage>
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
+              insetPadding: EdgeInsets.symmetric(horizontal: 5),
               title: Text(CsvLocalizations.instance.string('end')),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(CsvLocalizations.instance.string('end_app')),
+                  SizedBox(height: 30),
+                  Row(
+                    children: [
+                      Expanded(child: SizedBox()),
+                      TextButton(
+                        style: TextButton.styleFrom(
+                          backgroundColor: Colors.green,
+                        ),
+                        child: Text(
+                          CsvLocalizations.instance.string('ok'),
+                          style: TextStyle(
+                              color: Colors.white
+                          ),
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            SystemNavigator.pop();
+                          });
+                        },
+                      ),
+                      SizedBox(width: 10),
+                      TextButton(
+                        style: TextButton.styleFrom(
+                          backgroundColor: Colors.red,
+                        ),
+                        child: Text(
+                          CsvLocalizations.instance.string('cancel'),
+                          style: TextStyle(
+                              color: Colors.white
+                          ),
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            Navigator.pop(context);
+                          });
+                        },
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 20),
                   Container(
                     width: 330,
                     height: 260,
                     child: AdWidget(ad: endBanner),
-                  )
+                  ),
                 ],
               ),
-              actions: <Widget>[
-                FlatButton(
-                  color: Colors.green,
-                  textColor: Colors.white,
-                  child: Text(CsvLocalizations.instance.string('ok')),
-                  onPressed: () {
-                    setState(() {
-                      SystemNavigator.pop();
-                    });
-                  },
-                ),
-                FlatButton(
-                  color: Colors.red,
-                  textColor: Colors.white,
-                  child: Text(CsvLocalizations.instance.string('cancel'),),
-                  onPressed: () {
-                    setState(() {
-                      Navigator.pop(context);
-                    });
-                  },
-                ),
-              ],
             );
           },
         );
@@ -1044,39 +1089,50 @@ class _HomePageState extends State<HomePage>
         body: IndexedStack(
           index: _selectedIndex,
           children: [
-            Scaffold(
-              resizeToAvoidBottomInset : false,
-              appBar: AppBar(
-                elevation: 0.0,
-                backgroundColor: Colors.transparent,
-                actions: <Widget>[
-                  IconButton(
-                    tooltip: CsvLocalizations.instance.string('save'),
-                    onPressed: () {
-                      _displayTextInputDialog(context);
-                    },
-                    icon: Icon(
-                      FontAwesomeIcons.save,
-                      color: Colors.black,
+            Column(
+              children: [
+                SizedBox(height: 50),
+                Container(
+                  height: 50,
+                  child: AdWidget(ad: mainBanner),
+                ),
+                Expanded(
+                  child: Scaffold(
+                    resizeToAvoidBottomInset : false,
+                    appBar: AppBar(
+                      elevation: 0.0,
+                      backgroundColor: Colors.transparent,
+                      actions: <Widget>[
+                        IconButton(
+                          tooltip: CsvLocalizations.instance.string('save'),
+                          onPressed: () {
+                            _displayTextInputDialog(context);
+                          },
+                          icon: Icon(
+                            FontAwesomeIcons.save,
+                            color: Colors.black,
+                          ),
+                        )
+                      ],
                     ),
-                  )
-                ],
-              ),
-              body: Column(
-                children: <Widget>[
-                  Expanded(
-                    flex: 10,
-                    child: Stack(
-                      alignment: Alignment.bottomCenter,
-                      children: const <Widget>[
-                        MathBox(),
-                        SlidComponent(),
+                    body: Column(
+                      children: <Widget>[
+                        Expanded(
+                          flex: 10,
+                          child: Stack(
+                            alignment: Alignment.bottomCenter,
+                            children: const <Widget>[
+                              MathBox(),
+                              SlidComponent(),
+                            ],
+                          ),
+                        ),
+                        MathKeyBoard()
                       ],
                     ),
                   ),
-                  MathKeyBoard()
-                ],
-              ),
+                ),
+              ],
             ),
             settingPage(),
             formulaHistory(),
