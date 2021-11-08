@@ -322,7 +322,7 @@ class MyApp extends StatelessWidget {
           Locale('iw'), Locale('hi'),
         ],
         debugShowCheckedModeBanner: false,
-        title: 'handy calculator',
+        title: 'Scientific Calculator',
         theme: ThemeData(
           primarySwatch: Colors.brown,
           canvasColor: Colors.white,
