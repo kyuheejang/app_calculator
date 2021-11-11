@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'dart:async';
 
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
@@ -19,9 +20,8 @@ import 'package:app_calculator/src/widgets/keyboard.dart';
 import 'package:app_calculator/src/backend/math_model.dart';
 import 'package:csv_localizations/csv_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:app_calculator/ad/app_open_ad_manager.dart';
-import 'package:app_calculator/ad/app_lifecycle_refactor.dart';
 import 'package:app_calculator/screens/more_apps.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 
 
 String testInitialAdId = "ca-app-pub-3940256099942544/1033173712";
@@ -257,7 +257,10 @@ void main() async {
     onAdImpression: (InterstitialAd ad) => print('$ad impression occurred.'),
   );
 
-  runApp(const MyApp());
+  runZonedGuarded(() {
+    runApp(MyApp());
+  }, FirebaseCrashlytics.instance.recordError);
+
 }
 
 class MyApp extends StatelessWidget {
