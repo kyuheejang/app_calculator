@@ -322,7 +322,7 @@ class MyApp extends StatelessWidget {
           Locale('iw'), Locale('hi'),
         ],
         debugShowCheckedModeBanner: false,
-        title: 'handy calculator',
+        title: 'Scientific Calculator',
         theme: ThemeData(
           primarySwatch: Colors.brown,
           canvasColor: Colors.white,
@@ -1146,19 +1146,19 @@ class _HomePageState extends State<HomePage>
             items: <BottomNavigationBarItem>[
               BottomNavigationBarItem(
                   icon: Icon(FlutterIcons.md_calculator_ion),
-                  title: Text(CsvLocalizations.instance.string('calculator'))
+                  label: CsvLocalizations.instance.string('calculator')
               ),
               BottomNavigationBarItem(
                   icon: Icon(FlutterIcons.setting_ant),
-                  title: Text(CsvLocalizations.instance.string('setting'))
+                  label: CsvLocalizations.instance.string('setting')
               ),
               BottomNavigationBarItem(
                   icon: Icon(FontAwesomeIcons.history),
-                  title: Text(CsvLocalizations.instance.string('history'))
+                  label: CsvLocalizations.instance.string('history')
               ),
               BottomNavigationBarItem(
                 icon: more_apps_icon,
-                title: Text(CsvLocalizations.instance.string('moreApps')),
+                label: CsvLocalizations.instance.string('moreApps'),
               ),
             ]),
       ),
