@@ -45,25 +45,12 @@ class PushNotification {
 
 // 세팅 광고
 InterstitialAd? settingInter;
-
-// 수식 save 광고
 InterstitialAd? saveInter;
-
-// 수식 load 광고
 InterstitialAd? loadInter;
-
-// moreApps 광고
 InterstitialAd? moreAppsInter;
 
 late BannerAd settingBanner;
-
 late BannerAd endBanner;
-
-late BannerAd historyBanner;
-
-late BannerAd moreAppsBanner;
-
-late BannerAd mainBanner;
 
 AdmobInterstitialAd settingInterAd = AdmobInterstitialAd('SettingInter');
 AdmobInterstitialAd saveInterAd = AdmobInterstitialAd('FormulaSaveInter');
@@ -88,15 +75,6 @@ void main() async {
 
   AdmobBannerAd endBannerAd = AdmobBannerAd('EndBanner', AdSize.mediumRectangle);
   endBanner = await endBannerAd.getBannerAd();
-
-  AdmobBannerAd historyBannerAd = AdmobBannerAd('HistoryBanner', AdSize.mediumRectangle);
-  historyBanner = await historyBannerAd.getBannerAd();
-
-  AdmobBannerAd moreAppsBannerAd = AdmobBannerAd('MoreAppsBanner', AdSize.mediumRectangle);
-  moreAppsBanner = await moreAppsBannerAd.getBannerAd();
-
-  AdmobBannerAd mainBannerAd = AdmobBannerAd('MainBanner', AdSize.banner);
-  mainBanner = await mainBannerAd.getBannerAd();
 
   await settingInterAd.initializeInterstitialAd();
   await saveInterAd.initializeInterstitialAd();
@@ -543,8 +521,6 @@ class _HomePageState extends State<HomePage>
 
     WidgetsBinding.instance
         .addObserver(AppLifecycleReactor(appOpenAdManager: appOpenAdManager));
-
-    appOpenAdManager.showAdIfAvailable();
   }
 
   @override
@@ -694,13 +670,6 @@ class _HomePageState extends State<HomePage>
               },
             ),
           ),
-          Container(
-            height: 30,
-          ),
-          Container(
-              height: 250,
-              child: AdWidget(ad: historyBanner)
-          )
         ],
       )
     );
@@ -947,11 +916,6 @@ class _HomePageState extends State<HomePage>
           children: [
             Column(
               children: [
-                SizedBox(height: 50),
-                Container(
-                  height: 50,
-                  child: AdWidget(ad: mainBanner),
-                ),
                 Expanded(
                   child: Scaffold(
                     resizeToAvoidBottomInset : false,
