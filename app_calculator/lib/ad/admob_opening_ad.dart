@@ -1,47 +1,82 @@
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 
-/// Utility class that manages loading and showing app open ads.
-class InterAdManager {
+import 'package:flutter/foundation.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
+
+class AppOpenAdManager {
+
+  String testOpeningAdId = "";
+  String testAndOpeningAdId = "ca-app-pub-3940256099942544/3419835294";
+  String testIosOpeningAdId = "ca-app-pub-3940256099942544/5662855259";
+
+  late String addId;
+  String adName = "Opening";
+
+  AppOpenAd? _appOpenAd;
+  bool _isShowingAd = false;
+  bool _isInit = false;
+
   /// Maximum duration allowed between loading and showing the ad.
   final Duration maxCacheDuration = Duration(hours: 4);
-  String adUnitId;
-  InterAdManager({required this.adUnitId});
 
   /// Keep track of load time so we don't show an expired ad.
   DateTime? _appOpenLoadTime;
 
-  InterstitialAd? _appOpenAd;
-  bool _isShowingAd = false;
+  AppOpenAdManager() {
+    if (defaultTargetPlatform == TargetPlatform.iOS) {
+      adName = 'ios$adName';
+      testOpeningAdId = testIosOpeningAdId;
+    } else {
+      adName = 'and$adName';
+      testOpeningAdId = testAndOpeningAdId;
+    }
+  }
 
+  Future initializeOpeningAd() async {
+    if (!_isInit) {
+      if (kReleaseMode) {
+        final adCollectionReference = FirebaseFirestore.instance
+            .collection("ad_id").doc("ySiKuE840qZ9zWtmEDNv");
+        var value = await adCollectionReference.get();
+        addId = value.data()?[adName];
+      } else {
+        addId = testOpeningAdId;
+      }
+      _isInit = true;
+    }
+  }
 
-  /// Load an [InterstitialAd].
   void loadAd() {
-    InterstitialAd.load(
-      adUnitId: adUnitId,
+    AppOpenAd.load(
+      adUnitId: addId,
+      orientation: AppOpenAd.orientationPortrait,
       request: AdRequest(),
-      adLoadCallback: InterstitialAdLoadCallback(
+      adLoadCallback: AppOpenAdLoadCallback(
         onAdLoaded: (ad) {
-          print('$ad loaded');
-          _appOpenLoadTime = DateTime.now();
           _appOpenAd = ad;
+          _appOpenLoadTime = DateTime.now();
         },
         onAdFailedToLoad: (error) {
           print('AppOpenAd failed to load: $error');
+          // Handle the error.
         },
       ),
     );
   }
 
-  /// Whether an ad is available to be shown.
+  AppOpenAd? getInterstitialAd() {
+    return _appOpenAd;
+  }
+
   bool get isAdAvailable {
     return _appOpenAd != null;
   }
 
-  /// Shows the ad, if one exists and is not already being shown.
-  ///
-  /// If the previously cached ad has expired, this just loads and caches a
-  /// new ad.
   void showAdIfAvailable() {
+    if (!_isInit) {
+      return;
+    }
     if (!isAdAvailable) {
       print('Tried to show ad before available.');
       loadAd();
@@ -51,6 +86,7 @@ class InterAdManager {
       print('Tried to show ad while already showing an ad.');
       return;
     }
+
     if (DateTime.now().subtract(maxCacheDuration).isAfter(_appOpenLoadTime!)) {
       print('Maximum cache duration exceeded. Loading another ad.');
       _appOpenAd!.dispose();
@@ -81,3 +117,9 @@ class InterAdManager {
     _appOpenAd!.show();
   }
 }
+
+
+
+
+
+

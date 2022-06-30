@@ -1,18 +1,14 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:csv_localizations/csv_localizations.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:translator/translator.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:app_calculator/widgets/widgets.dart';
-import 'package:flutter/foundation.dart';
-import 'package:app_calculator/ad/banner_ad_manager.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 String currentAppName = "handy scientific calculator";
 String testInitialAdId = "ca-app-pub-3940256099942544/1033173712";
-String testBannerAdId = "ca-app-pub-3940256099942544/6300978111";
 
 class Apps {
   String appName;
@@ -35,8 +31,7 @@ List<dynamic> appLinks = [];
 List<Apps> appInfos = [];
 
 class MoreApps extends StatefulWidget {
-  BannerAd moreAppsBanner;
-  MoreApps({required this.moreAppsBanner});
+  MoreApps();
   @override
   _MoreAppsState createState() => _MoreAppsState();
 }
@@ -130,10 +125,6 @@ class _MoreAppsState extends State<MoreApps> {
           Container(
             height: 30,
           ),
-          Container(
-              height: 250,
-              child: AdWidget(ad: widget.moreAppsBanner)
-          )
         ],
       ),
     );

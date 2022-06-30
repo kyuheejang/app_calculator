@@ -19,26 +19,14 @@ import 'package:app_calculator/src/widgets/keyboard.dart';
 import 'package:app_calculator/src/backend/math_model.dart';
 import 'package:csv_localizations/csv_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:app_calculator/ad/app_open_ad_manager.dart';
-import 'package:app_calculator/ad/app_lifecycle_refactor.dart';
 import 'package:app_calculator/screens/more_apps.dart';
+import 'package:app_calculator/ad/admob_banner_ad.dart';
+import 'package:app_calculator/ad/admob_Interstitial_ad.dart';
+import 'package:app_calculator/ad/admob_opening_ad.dart';
+import 'package:app_calculator/ad/lifecycle_refactor.dart';
 
-
-String testInitialAdId = "ca-app-pub-3940256099942544/1033173712";
-String testBannerAdId = "ca-app-pub-3940256099942544/6300978111";
 String testOpeningAdId = "ca-app-pub-3940256099942544/3419835294";
 
-String endBannerAdId = "";
-
-String settingInterAdId = "";
-String formulaSaveInterAdId = "";
-String formulaLoadInterAdId = "";
-String settingBannerAdId = "";
-String historyBannerAdId = "";
-String mainBannerAdId = "";
-String moreAppsInterAdId = "";
-String openingAdId = "";
-String moreAppsBannerAdId = "";
 int functionColorIndex = 0;
 int numberColorIndex = 0;
 Color functionBackgroundColor = Colors.black87;
@@ -56,51 +44,34 @@ class PushNotification {
 }
 
 // 세팅 광고
-InterstitialAd? settingInterAd;
+InterstitialAd? settingInter;
 
 // 수식 save 광고
-InterstitialAd? saveInterAd;
+InterstitialAd? saveInter;
 
 // 수식 load 광고
-InterstitialAd? loadInterAd;
+InterstitialAd? loadInter;
 
 // moreApps 광고
-InterstitialAd? moreAppsInterAd;
+InterstitialAd? moreAppsInter;
 
-final BannerAd settingBanner = BannerAd(
-  adUnitId: settingBannerAdId,
-  size: AdSize.banner,
-  request: const AdRequest(),
-  listener: const BannerAdListener(),
-);
+late BannerAd settingBanner;
 
-final BannerAd endBanner = BannerAd(
-  adUnitId: endBannerAdId,
-  size: AdSize.mediumRectangle,
-  request: const AdRequest(),
-  listener: const BannerAdListener(),
-);
+late BannerAd endBanner;
 
-final BannerAd historyBanner = BannerAd(
-  adUnitId: historyBannerAdId,
-  size: AdSize.mediumRectangle,
-  request: const AdRequest(),
-  listener: const BannerAdListener(),
-);
+late BannerAd historyBanner;
 
-final BannerAd moreAppsBanner = BannerAd(
-  adUnitId: moreAppsBannerAdId,
-  size: AdSize.mediumRectangle,
-  request: const AdRequest(),
-  listener: const BannerAdListener(),
-);
+late BannerAd moreAppsBanner;
 
-final BannerAd mainBanner = BannerAd(
-  adUnitId: mainBannerAdId,
-  size: AdSize.banner,
-  request: const AdRequest(),
-  listener: const BannerAdListener(),
-);
+late BannerAd mainBanner;
+
+AdmobInterstitialAd settingInterAd = AdmobInterstitialAd('SettingInter');
+AdmobInterstitialAd saveInterAd = AdmobInterstitialAd('FormulaSaveInter');
+AdmobInterstitialAd loadInterAd = AdmobInterstitialAd('FormulaLoadInter');
+AdmobInterstitialAd moreAppsInterAd = AdmobInterstitialAd('MoreAppsInter');
+
+Widget moreApps = MoreApps();
+AppOpenAdManager appOpenAdManager = AppOpenAdManager();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -109,155 +80,33 @@ void main() async {
   await Firebase.initializeApp();
   prefs = await SharedPreferences.getInstance();
 
-
-  if (kReleaseMode) { // is Release Mode ??
-    final adCollectionReference = FirebaseFirestore.instance
-        .collection("ad_id").doc("ySiKuE840qZ9zWtmEDNv");
-    var value = await adCollectionReference.get();
-
-    if (defaultTargetPlatform == TargetPlatform.iOS) {
-      settingInterAdId = value.data()?['iosSettingInter'];
-      settingBannerAdId = value.data()?['iosSettingBanner'];
-      formulaSaveInterAdId = value.data()?['iosFormulaSaveInter'];
-      formulaLoadInterAdId = value.data()?['iosFormulaLoadInter'];
-      moreAppsInterAdId = value.data()?['iosMoreAppsInter'];
-      moreAppsBannerAdId = value.data()?['iosMoreAppsBanner'];
-      endBannerAdId = value.data()?['iosEndBanner'];
-      historyBannerAdId = value.data()?['iosHistoryBanner'];
-      mainBannerAdId = value.data()?['iosMainBanner'];
-    } else {
-      settingInterAdId = value.data()?['andSettingInter'];
-      settingBannerAdId = value.data()?['andSettingBanner'];
-      formulaSaveInterAdId = value.data()?['andFormulaSaveInter'];
-      formulaLoadInterAdId = value.data()?['andFormulaLoadInter'];
-      moreAppsInterAdId = value.data()?['andMoreAppsInter'];
-      moreAppsBannerAdId = value.data()?['andMoreAppsBanner'];
-      endBannerAdId = value.data()?['andEndBanner'];
-      historyBannerAdId = value.data()?['andHistoryBanner'];
-      mainBannerAdId = value.data()?['andMainBanner'];
-    }
-  } else {
-    settingInterAdId = testInitialAdId;
-    formulaSaveInterAdId = testInitialAdId;
-    formulaLoadInterAdId = testInitialAdId;
-    settingBannerAdId = testBannerAdId;
-    endBannerAdId = testBannerAdId;
-    historyBannerAdId = testBannerAdId;
-    moreAppsInterAdId = testInitialAdId;
-    moreAppsBannerAdId = testBannerAdId;
-    mainBannerAdId = testBannerAdId;
-  }
-
   await MobileAds.instance.initialize();
   await MobileAds.instance.setAppMuted(true);
 
-  settingBanner.load();
-  endBanner.load();
-  historyBanner.load();
-  moreAppsBanner.load();
-  mainBanner.load();
+  AdmobBannerAd settingBannerAd = AdmobBannerAd('SettingBanner', AdSize.banner);
+  settingBanner = await settingBannerAd.getBannerAd();
 
-  await InterstitialAd.load(adUnitId: settingInterAdId,
-      request: const AdRequest(),
-      adLoadCallback: InterstitialAdLoadCallback(
-        onAdLoaded: (ad) {
-          settingInterAd=ad;
-        },
-        onAdFailedToLoad: (error) {
-          settingInterAd=null;
-        },
-      ));
+  AdmobBannerAd endBannerAd = AdmobBannerAd('EndBanner', AdSize.mediumRectangle);
+  endBanner = await endBannerAd.getBannerAd();
 
-  settingInterAd?.fullScreenContentCallback = FullScreenContentCallback(
-    onAdShowedFullScreenContent: (InterstitialAd ad) =>
-        print('$ad onAdShowedFullScreenContent.'),
-    onAdDismissedFullScreenContent: (InterstitialAd ad) {
-      print('$ad onAdDismissedFullScreenContent.');
-      ad.dispose();
-    },
-    onAdFailedToShowFullScreenContent: (InterstitialAd ad, AdError error) {
-      print('$ad onAdFailedToShowFullScreenContent: $error');
-      ad.dispose();
-    },
-    onAdImpression: (InterstitialAd ad) => print('$ad impression occurred.'),
-  );
+  AdmobBannerAd historyBannerAd = AdmobBannerAd('HistoryBanner', AdSize.mediumRectangle);
+  historyBanner = await historyBannerAd.getBannerAd();
 
-  await InterstitialAd.load(adUnitId: formulaSaveInterAdId,
-      request: const AdRequest(),
-      adLoadCallback: InterstitialAdLoadCallback(
-        onAdLoaded: (ad) {
-          saveInterAd=ad;
-        },
-        onAdFailedToLoad: (error) {
-          saveInterAd = null;
-        },
-      ));
+  AdmobBannerAd moreAppsBannerAd = AdmobBannerAd('MoreAppsBanner', AdSize.mediumRectangle);
+  moreAppsBanner = await moreAppsBannerAd.getBannerAd();
 
-  saveInterAd?.fullScreenContentCallback = FullScreenContentCallback(
-    onAdShowedFullScreenContent: (InterstitialAd ad) =>
-        print('$ad onAdShowedFullScreenContent.'),
-    onAdDismissedFullScreenContent: (InterstitialAd ad) {
-      print('$ad onAdDismissedFullScreenContent.');
-      ad.dispose();
-    },
-    onAdFailedToShowFullScreenContent: (InterstitialAd ad, AdError error) {
-      print('$ad onAdFailedToShowFullScreenContent: $error');
-      ad.dispose();
-    },
-    onAdImpression: (InterstitialAd ad) => print('$ad impression occurred.'),
-  );
+  AdmobBannerAd mainBannerAd = AdmobBannerAd('MainBanner', AdSize.banner);
+  mainBanner = await mainBannerAd.getBannerAd();
 
-  await InterstitialAd.load(adUnitId: formulaLoadInterAdId,
-      request: const AdRequest(),
-      adLoadCallback: InterstitialAdLoadCallback(
-        onAdLoaded: (ad) {
-          loadInterAd=ad;
-        },
-        onAdFailedToLoad: (error) {
-          loadInterAd = null;
-        },
-      ));
-
-  loadInterAd?.fullScreenContentCallback = FullScreenContentCallback(
-    onAdShowedFullScreenContent: (InterstitialAd ad) =>
-        print('$ad onAdShowedFullScreenContent.'),
-    onAdDismissedFullScreenContent: (InterstitialAd ad) {
-      print('$ad onAdDismissedFullScreenContent.');
-      ad.dispose();
-    },
-    onAdFailedToShowFullScreenContent: (InterstitialAd ad, AdError error) {
-      print('$ad onAdFailedToShowFullScreenContent: $error');
-      ad.dispose();
-    },
-    onAdImpression: (InterstitialAd ad) => print('$ad impression occurred.'),
-  );
-
-  await InterstitialAd.load(adUnitId: moreAppsInterAdId,
-      request: const AdRequest(),
-      adLoadCallback: InterstitialAdLoadCallback(
-        onAdLoaded: (ad) {
-          moreAppsInterAd=ad;
-        },
-        onAdFailedToLoad: (error) {
-          moreAppsInterAd = null;
-        },
-      ));
-
-  moreAppsInterAd?.fullScreenContentCallback = FullScreenContentCallback(
-    onAdShowedFullScreenContent: (InterstitialAd ad) =>
-        print('$ad onAdShowedFullScreenContent.'),
-    onAdDismissedFullScreenContent: (InterstitialAd ad) {
-      print('$ad onAdDismissedFullScreenContent.');
-      ad.dispose();
-    },
-    onAdFailedToShowFullScreenContent: (InterstitialAd ad, AdError error) {
-      print('$ad onAdFailedToShowFullScreenContent: $error');
-      ad.dispose();
-    },
-    onAdImpression: (InterstitialAd ad) => print('$ad impression occurred.'),
-  );
+  await settingInterAd.initializeInterstitialAd();
+  await saveInterAd.initializeInterstitialAd();
+  await loadInterAd.initializeInterstitialAd();
+  await moreAppsInterAd.initializeInterstitialAd();
+  await appOpenAdManager.initializeOpeningAd();
+  appOpenAdManager.loadAd();
 
   runApp(const MyApp());
+
 }
 
 class MyApp extends StatelessWidget {
@@ -399,9 +248,9 @@ class _HomePageState extends State<HomePage>
   final TextEditingController _textFieldController = TextEditingController();
 
   Future<void> _displayTextInputDialog(BuildContext context) async {
-
-    if (saveInterAd != null) {
-      await saveInterAd!.show();
+    saveInter = saveInterAd.getInterstitialAd();
+    if (saveInter != null) {
+      await saveInter!.show();
     }
 
     String saveName = "";
@@ -692,6 +541,10 @@ class _HomePageState extends State<HomePage>
       more_apps_icon = Icon(FlutterIcons.android1_ant);
     }
 
+    WidgetsBinding.instance
+        .addObserver(AppLifecycleReactor(appOpenAdManager: appOpenAdManager));
+
+    appOpenAdManager.showAdIfAvailable();
   }
 
   @override
@@ -1002,18 +855,21 @@ class _HomePageState extends State<HomePage>
       _selectedIndex=index;
     });
     if (index == 1) {
-      if (settingInterAd != null) {
-        await settingInterAd!.show();
+      settingInter = settingInterAd.getInterstitialAd();
+      if (settingInter != null) {
+        await settingInter!.show();
       }
     }
     if (index == 2) {
-      if (loadInterAd != null) {
-        await loadInterAd!.show();
+      loadInter = loadInterAd.getInterstitialAd();
+      if (loadInter != null) {
+        await loadInter!.show();
       }
     }
     if (index == 3) {
-      if (moreAppsInterAd != null) {
-        await moreAppsInterAd!.show();
+      moreAppsInter = moreAppsInterAd.getInterstitialAd();
+      if (moreAppsInter != null) {
+        await moreAppsInter!.show();
       }
     }
   }
@@ -1136,7 +992,7 @@ class _HomePageState extends State<HomePage>
             ),
             settingPage(),
             formulaHistory(),
-            MoreApps(moreAppsBanner: moreAppsBanner),
+            moreApps
           ],
         ),
         bottomNavigationBar: BottomNavigationBar(
